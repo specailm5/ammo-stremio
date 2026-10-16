@@ -67,7 +67,7 @@ reader who stops early still has a working Stremio.
 
 | # | Source | What the card says it gives | Config baked | Verified |
 |---|---|---|---|---|
-| 1 | Streaming Catalogs | Netflix, Disney+, Prime, Apple TV+, HBO Max rows, films and series | `nfx,dnp,amp,atp,hbm::US:1792122105697:0:0:SA` | yes, 10 boards |
+| 1 | Streaming Catalogs | Netflix, Disney+, Prime, Apple TV+, HBO Max rows, films and series | none needed, the bare URL already serves those five services | yes, 10 boards |
 | 2 | Dramayo | Subtitled Asian series: Korean, Chinese, Japanese | curated `enabledCatalogs` | no, capture in M1 |
 | 3 | HdHub | Watch sources for films and series | curated `catalogs`, `content`, `qualities` | no, capture in M1 |
 | 4 | Flix-Streams | Extra watch sources, including live channel rows | curated config | no, capture in M1 |
@@ -82,6 +82,13 @@ Two consequences worth writing down now:
   the reader think something is broken.
 - **Kitsu has no configure page at all**, so its card is the only one with no copy-link variant of a
   config choice. It still gets a copy-link button, because the URL still has to reach a TV.
+
+A correction from the capture pass, worth keeping because it is exactly the sort of thing that would
+otherwise have shipped broken: the config string this plan first recorded for Streaming Catalogs,
+`nfx,dnp,amp,atp,hbm::US:1792122105697:0:0:SA`, returns **two** boards, not ten. The bare manifest URL
+returns precisely the ten the card promises, one movie and one series board per service. Every config
+path tried collapses the response to a single `netflix-top10-global` pair, so the bare URL is the
+correct install and nothing is baked at all.
 
 ## 5. The token step, in full
 
@@ -155,6 +162,29 @@ The five unverified configs are mechanical to obtain, and the procedure is the s
 The captures go in one place, `web/app.js` as a `UPSTREAMS` array, which is the entire maintenance
 surface of this project. When an upstream rotates its format, that array is the one-line fix, and the
 cost of the fix is that every user must revisit the page (the trade-off from §16, restated in §9).
+
+### Resolved in the capture pass (2026-10-16)
+
+Recorded so a later session does not re-derive them. Every host answered, and the table in `web/app.js`
+points each card at its base.
+
+| Source | Base | Card state |
+|---|---|---|
+| Streaming Catalogs | `https://7a82163c306e-stremio-netflix-catalog-addon.baby-beamup.club` | captured, bare `manifest.json`, 10 boards |
+| Dramayo | `https://dramayo.stream` | pending, `enabledCatalogs` |
+| HdHub | `https://hdhub.thevolecitor.qzz.io` | pending, `catalogs`, `content`, `qualities` |
+| Flix-Streams | `https://free.flixnest.app` | pending, config unknown until captured |
+| Anime Kitsu | `https://anime-kitsu.strem.fun` | captured, and no configure page exists |
+| OpenSubtitles PRO | `https://opensubtitlesv3-pro.dexter21767.com` | pending, `langs: ["arabic"]` |
+| PenguPlay | `https://pengu.uk/<base64url>` | captured, encoder proved end to end |
+
+The PenguPlay encoder is proved rather than assumed: the page's own output, fetched back, returns `200`
+with `id: com.penguplay`. That `id` is the check that matters, because the addon answers `200` even for
+a config it dislikes.
+
+One format question was settled at the same time, since a wrong answer would have baked a dead button
+into all seven cards: the install link is `stremio://install?url=<percent-encoded manifest URL>`, which
+is the form the official SDK prints as its own install command. Device confirmation is still M3.
 
 ## 7. Copy deck (Arabic)
 
@@ -311,8 +341,8 @@ be verified before that copy is written.
 | # | Milestone | Done when |
 |---|---|---|
 | M0 | Recon | Done. 2 of 7 configs verified, token field identified, palette contrast computed, skills read. |
-| M1 | Verify assumptions, capture configs | Sync-between-devices confirmed or refuted; the 5 remaining configs captured and each proved by a manifest fetch that returns the expected boards; the token field confirmed against a real token. |
-| M2 | Shell | `web/` renders in both themes at phone, tablet, and desktop widths; design tokens ported from `docs/DESIGN.md`; zero horizontal scroll; `git init` and first commit. |
+| M1 | Verify assumptions, capture configs | Hosts and two configs resolved (see §6); the 4 remaining configs captured and each proved by a manifest fetch that returns the expected boards; the token field confirmed against a real token. |
+| M2 | Shell | Done. `web/` renders in both themes, no horizontal overflow from 305px to desktop, every control at least 44px, design tokens ported from `docs/DESIGN.md`, `git init` and first commit. The layout has exactly two states, phone at 480px and below, and a single column capped at 44rem above it, so phone and desktop cover tablet. |
 | M3 | Steps | Seven cards, deep links open Stremio on a real device, copy fallback works where the clipboard API is absent, progress persists across reloads. |
 | M4 | Token step | A real token produces a working PenguPlay install with visible streams; bot-unreachable path shows the fallback. |
 | M5 | Recovery and FAQ | Both written, both reachable from the top, and the recovery sequence verified against the real Stremio UI. |
@@ -345,19 +375,23 @@ This document is a plan, not a UI, so the Delivery Gate in the core does not app
 gate runs at M6 against the built page, with a recorded click-through. What is already satisfied at
 plan level, and what is not:
 
-- **R-37 direction:** recorded in `docs/DESIGN.md`, with the owner's own instructions quoted and the
-  agent's proposals marked for sign-off. Not silently filled in.
+- **R-37 direction:** recorded in `docs/DESIGN.md`, with the owner's own instructions quoted. The
+  open choices were settled on 2026-10-16 rather than left to the build, and the one constraint given
+  at that point (avoid generic colors such as purple) is recorded alongside them.
 - **R-23 assets:** nothing invented. No logo, no mascot, no avatars, no statistics, no testimonials.
   The one image is the QR, which is derived from the bot URL and verified by decoding it, not
   accepted as mystery artwork.
 - **R-31 reasons:** every palette, type, radius, and ordering decision above carries a one-line reason.
-- **R-36 / R-38:** no fabricated claims in the copy deck. The two strings that would need an
-  unverified fact are marked as such and are blocked on M1.
+- **R-36 / R-38:** no fabricated claims in the copy deck. The one string that rests on the owner's word
+  rather than a measurement, the cost of the token, says so in §5.4.
 - **R-02:** no em dashes in this file or in `docs/DESIGN.md`.
-- **R-25:** every color pair listed in `docs/DESIGN.md` was computed with the skill's contrast
-  checker. One candidate border failed at 2.57:1 and was replaced.
-- **Pending:** the entire UI-side gate (R-03, R-26, R-27, R-32, R-34, R-35, and the liveliness
-  block), because the page does not exist yet.
+- **R-25:** every color pair in `docs/DESIGN.md` was computed with the skill's contrast checker. Three
+  candidates failed and were replaced: `#5A5F49` at 2.57:1, `#8A8B78` at 2.96:1, and `#DEDCD0` as a
+  separator at 1.27:1 against 1.53:1 for its dark counterpart.
+- **Partially satisfied now that the shell exists:** R-26 and R-27 in the clipboard fallback and the
+  empty states, both exercised in the M2 pass.
+- **Pending:** the rest of the UI-side gate (R-03, R-32, R-34, R-35, and the liveliness block) because
+  it runs at M6 against the finished page with a recorded click-through, not against a scaffold.
 
 One loose end: the existing `docs/PLAN.md` uses em dashes throughout, written before this rule was
 in play. Say the word and I sweep it in the same pass.
