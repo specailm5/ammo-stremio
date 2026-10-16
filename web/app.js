@@ -473,6 +473,8 @@ function main() {
 
   let token = "";
 
+  const extra = document.getElementById("bulk-extra");
+
   const pengu = UPSTREAMS.find((step) => step.token);
   const penguCard = () => list.querySelector(`[data-id="${pengu.id}"]`);
 
@@ -484,6 +486,8 @@ function main() {
   function render() {
     track.style.width = `${(done.size / total) * 100}%`;
     progress.textContent = done.size === 0 ? "ما أضفت شي للحين." : `أضفت ${done.size} من ${total}.`;
+    /* Once a token is typed, the shortcut carries that addon too, so the note stops applying. */
+    extra.hidden = Boolean(token.trim());
 
     for (const card of list.children) {
       const step = UPSTREAMS.find((item) => item.id === card.dataset.id);
@@ -730,6 +734,19 @@ function main() {
         }
       });
     }
+
+    document.getElementById("bulk-extra-go").addEventListener("click", () => {
+      const card = penguCard();
+      if (!card) return;
+      /*
+        block "start" rather than "center": the card is taller than a phone viewport, so
+        the reader needs its name and its first step, not its middle.
+      */
+      const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      card.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+      const field = card.querySelector("#token");
+      if (field) field.focus({ preventScroll: true });
+    });
   }
 
   function applyTheme(mode) {

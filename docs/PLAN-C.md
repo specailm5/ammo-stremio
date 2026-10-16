@@ -313,6 +313,11 @@ answers that explained the site's own architecture. The page says less and the r
   explains why it did not. The cleanup and the field clearing are real, they are just silent.
 - The way out, kept beside the way in: إذا ما ارتحت تكتب كلمة مرورك هنا، خلّ القسم هذا واشتغل بالأزرار
   اللي تحت.
+- The seventh addon needs a token of the reader's own, so the shortcut cannot carry it, and a reader who
+  counts six never learns where the seventh went. The gap is closed where it opens: إضافة وحدة ما تنضاف
+  معهم: PenguPlay، لأنها تبي رمز خاص لك. with a control, روح لها, that walks the reader to that card and
+  puts its field in focus. It hides itself as soon as a token is typed, because then the shortcut does
+  carry it. It is the only string on the page that says a thing is missing from the batch.
 
 **Manual path preamble:** تأكد إن ستريميو مثبّت عندك. وإذا ما كنت مسجّل دخول بنفس الحساب في الجوال
 والتلفاز، انسخ روابط الإضافات اللي تحت والصقها على التلفاز وحدة وحدة.
@@ -379,6 +384,9 @@ that something is empty (R-27):
   `navigator.clipboard`, where the URL is shown in a selectable field instead. A copy button that
   silently fails on an older Android browser is worse than no button (R-26).
 - **Step marks:** unmarked, marked, and the page's own summary of how many remain.
+- **The carried and not-carried note:** under the sign-in button, visible while the token field is empty
+  and gone the moment a token is typed, because that is when the shortcut starts carrying that addon
+  too. Its button jumps to the token step and puts its field in focus.
 - **No network loading states exist, because the page makes no requests.** If an upstream is down,
   that shows up in Stremio, not here, and the recovery section is where we say so.
 
@@ -550,6 +558,12 @@ account-free route is one scroll below and complete on its own, and the line abo
 what is sent and where. What does not: had the form been an auth key only, the page would ask for no
 password at all and this argument would disappear. That trade is the owner's, and it is written here
 so a later reader can see it was weighed rather than missed.
+
+The shortcut carries six of the seven addons. The seventh is not a defect and not an oversight, it is the
+token: that addon's URL cannot exist until the reader has a token of their own, so no static page can
+write it for them. Rather than leave a reader counting six and wondering, the form says which one is
+missing and hands them a button to it. The note withdraws itself the moment a token is typed, because
+then the shortcut does carry it, which is the only state in which the sentence would be false.
 
 The auth-key door is the other half of the sign-in path, and it is the only door a Facebook or Apple
 account has, those being the two social providers Stremio offers. That was read off the client rather

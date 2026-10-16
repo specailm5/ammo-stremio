@@ -74,6 +74,10 @@ does or knows. Nothing that describes the plumbing ships, so phrases such as how
 cleaned, that the fields are cleared afterwards, or why the site has no single combined link are kept in
 this README and in `docs/PLAN-C.md` rather than on the page. Section 7 records the pass that applied it.
 
+One addon, the token one, cannot travel by the shortcut, because its URL needs a token of the reader's
+own. The form says so underneath its button and carries a control that scrolls to that step and focuses
+its field. The note hides itself once a token is typed, since the shortcut then carries that addon too.
+
 ## Regenerating assets
 
 Both scripts are idempotent and fetch from upstream at build time. The published page never touches

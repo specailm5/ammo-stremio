@@ -222,6 +222,9 @@ ol.steps {
 
 .step {
   padding: var(--s5);
+  /* A card taller than the viewport is jumped to from its top, so the sticky bar must
+     not cover the name it lands on. */
+  scroll-margin-block-start: calc(var(--bar) + var(--s3));
 }
 
 .step + .step {
@@ -552,6 +555,25 @@ ol.mini li + li {
 
 .bulk-result li + li {
   margin-block-start: var(--s2);
+}
+
+/*
+  The one addon the shortcut cannot carry, because its URL needs a per-reader token. It sits
+  directly under the button while the page is idle, since the status and the result list are
+  empty then, and it takes the reader to the step that can finish the job.
+*/
+.bulk-extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+  margin-block-start: var(--s5);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.bulk-extra[hidden] {
+  display: none;
 }
 
 .bulk .privacy {
