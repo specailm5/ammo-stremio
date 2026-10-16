@@ -1,3 +1,6 @@
+# Local agent skills. Kept on disk, kept out of the published repository.
+,agents/
+
 # Build inputs for the font subsets. The shipped woff2 files are committed.
 web/assets/fonts/.source/
 
