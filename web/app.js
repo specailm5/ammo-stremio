@@ -107,8 +107,7 @@ const UPSTREAMS = [
     id: "flix",
     name: "Flix-Streams",
     gives:
-      "مصادر زيادة، وفيها صفوف قنوات مباشرة. بعض ملفاتها تتكرر مع الخطوة الثالثة، " +
-      "يعني نفس الملف يمكن يجيك مرتين.",
+      "مصادر زيادة، وفيها صفوف قنوات مباشرة. ويمكن يجيك نفس الملف مرتين.",
     proof: "the bare url returns the same 8 streams and 40 live events as the publisher's own default blob, 2026-10-16",
     ready: true,
     url: () => `${FLIX}/manifest.json`,
@@ -423,13 +422,13 @@ function tokenMarkup() {
       <li>افتح محادثة البوت في تيليجرام: <a href="${BOT_URL}" rel="noopener">افتح البوت</a></li>
       <li>أرسل له الأمر <code dir="ltr">/token</code></li>
       <li>بيجيك رمز. انسخه.</li>
-      <li>الصقه في الحقل اللي تحت، وبعدها اضغط زر الإضافة.</li>
+      <li>الصقه في الحقل اللي تحت.</li>
     </ol>
     <figure class="qr">
       <img src="assets/penguplay-qr.png" width="444" height="444" decoding="async"
            alt="رمز QR يفتح محادثة PenguPlayBot في تيليجرام">
       <figcaption>
-        أو امسح هالرمز بكاميرا جوالك. المسح يفيدك لما تكون الصفحة قدامك على التلفاز أو اللابتوب.
+        أو امسح هالرمز بكاميرا جوالك.
       </figcaption>
     </figure>
     <div class="field">
@@ -438,7 +437,7 @@ function tokenMarkup() {
              spellcheck="false" placeholder="الصق الرمز هنا">
       <p class="hint" data-hint>ما لصقت رمز للحين.</p>
     </div>
-    <p class="privacy">متصفحك يبني الرابط هنا، وما يرسل الرمز لأي جهة.</p>
+    <p class="privacy">ما نرسل رمزك لأي جهة.</p>
     <p class="fallback-line">
       إذا البوت ما رد، ادخل سيرفر <bdi dir="ltr">PenguPlay</bdi> على ديسكورد، واكتب
       نفس الأمر هناك: <a href="${DISCORD_URL}" rel="noopener">سيرفر ديسكورد</a>
@@ -619,7 +618,7 @@ function main() {
       */
       if (authKey === "undefined" || authKey === "null") {
         hint.textContent =
-          "اللي لصقته مو مفتاح. تأكد إنك مسجّل دخول في web.stremio.com، وجرّب السطر مرة ثانية.";
+          "اللي لصقته مو مفتاح. تأكد إنك مسجّل دخول في web.stremio.com.";
         hint.classList.add("is-warning");
         return;
       }

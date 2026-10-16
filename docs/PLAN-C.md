@@ -265,6 +265,12 @@ dialect knowing that, so the trade is his call and not an oversight.
 The exact shipped strings are in `web/index.html` and `web/app.js`. What follows is the deck they were
 written from, so the two can be compared after any future edit.
 
+One rule governs what is here at all, and the owner set it on 2026-10-16 after reading the first draft: a
+sentence earns its place only if it changes what the reader does or knows. Anything that described how
+the page works rather than what the reader gets was cut in that pass, including the note that a pasted
+key is cleaned of stray quotes, the field clearing, the sync mechanism behind the promise, and three FAQ
+answers that explained the site's own architecture. The page says less and the reader loses nothing.
+
 **Wordmark:** عمو ستريميو
 
 **Headline:** إضافات ستريميو جاهزة، بضغطة وحدة
@@ -277,41 +283,39 @@ written from, so the two can be compared after any future edit.
 **Sign-in section, the first choice (§16):**
 
 - Heading: أضفها كلها بضغطة وحدة
-- Intro: سجّل دخولك بحساب ستريميو، وتنضاف الإضافات كلها مرة وحدة. وإذا كنت مسجّل بنفس الحساب على تلفازك،
-  توصل له على طول مع أول مزامنة.
-- The line that carries the whole promise: هذا القسم وحده هو اللي يرسل شي من الصفحة، واللي ترسله يروح
-  لستريميو بس. ما عندنا خادم، ولا نحفظ شي، والحقلين ينمسحون بعد كل محاولة.
+- Intro: سجّل دخولك بحساب ستريميو، وتنضاف الإضافات كلها مرة وحدة. وإذا كنت مسجّل بنفس الحساب على
+  تلفازك، توصل له على طول.
+- The line that carries the whole promise: اللي تكتبه هنا يروح لستريميو مباشرة، ولا نحفظه.
 - Button: أضفها لحسابي
 - Labels: إيميلك في ستريميو · كلمة المرور · مفتاح الدخول
-- Hint: اكتب إيميلك وكلمة المرور، وبعدها اضغط الزر.
-- The password-free door, kept for Facebook and Apple accounts and useful to anyone who would rather
-  not type a password. Those accounts have no other way in, so it is a full procedure and not a hint.
-  The summary names the reader's own situation rather than the mechanism, because مفتاح and كلمة مرور
-  are the page's words and not the reader's: مسوّي حسابك بفيسبوك ولا آبل؟ It carries a plain اضغط هنا
-  afterwards, because a reader who has never met a disclosure does not know the line opens. Its opening
-  line answers the question the summary asks and then covers the second reader: يعني ما لك كلمة مرور في
-  ستريميو، فدخولك يصير بمفتاح. خُذ المفتاح بالطريقة هذي، ولو عندك كلمة مرور وتبغى تدخل بمفتاح بدالها
-  فهي تنفعك برضه. وسوّها على لابتوب أو كمبيوتر، لأن الجوال ما يفتح كونسول. The five steps in order:
-  افتح web.stremio.com وسجّل دخولك
-  بحسابك · افتح كونسول المتصفح: اضغط F12، أو Ctrl+Shift+J · أول مرة تبغى تلصق في الكونسول، يطلع لك
+- Hint: اكتب إيميلك وكلمة المرور.
+- The password-free door, kept for Facebook and Apple accounts, which have no other way in, so it is a
+  full procedure and not a hint. The summary names the reader's own situation rather than the mechanism,
+  because مفتاح and كلمة مرور are the page's words and not the reader's: مسوّي حسابك بفيسبوك ولا آبل؟ It
+  carries a plain اضغط هنا afterwards, because a reader who has never met a disclosure does not know the
+  line opens. Its opening line answers the question the summary asks: يعني ما لك كلمة مرور في ستريميو،
+  فدخولك يصير بمفتاح. سوّها على كمبيوتر، لأن الجوال ما يفتح كونسول. The five steps in order: افتح
+  web.stremio.com وسجّل دخولك · اضغط F12 عشان يفتح لك الكونسول · أول مرة تبغى تلصق في الكونسول، يطلع لك
   تحذير ويمنعك، فاكتب allow pasting واضغط Enter · الصق هذا السطر:
   `JSON.parse(localStorage.getItem("profile")).auth.key` (control: انسخ السطر) · انسخ المفتاح اللي طلع
-  والصقه في الحقل، ولو جا وعليه علامات تنصيص أو مسافات ننظفها لك. It closes with the rule a page that
-  teaches console pasting owes its reader: ولا تلصق في الكونسول أي سطر يجيك من موقع ثاني, plus the
-  failure mode of the snippet itself, which throws when there is no signed-in profile to read: ولو طلع
-  لك خطأ، تأكد إنك مسجّل دخول في web.stremio.com من نفس المتصفح.
+  والصقه في الحقل. It closes with the rule a page that teaches console pasting owes its reader: ولا تلصق
+  في الكونسول أي سطر يجيك من موقع ثاني, plus the failure mode of the snippet itself, which throws when
+  there is no signed-in profile to read: ولو طلع لك خطأ، تأكد إنك مسجّل دخول في web.stremio.com.
 
   The value is pulled apart before it is used, because a console prints a returned string inside quote
   marks and a paste can carry spaces or a newline with it. Surrounding quotes of the straight, curly
   and backtick kinds come off along with the whitespace, twice over, so a value that arrives double
   wrapped still lands clean. The literal word `undefined`, which the snippet prints when the profile
   holds no auth key yet, is answered with that reason instead of being sent as a key.
+
+  None of that reaches the copy, on the owner's instruction of 2026-10-16. The rule is that the page
+  carries no detail the reader cannot act on: the reader pastes the key and it either works or the hint
+  explains why it did not. The cleanup and the field clearing are real, they are just silent.
 - The way out, kept beside the way in: إذا ما ارتحت تكتب كلمة مرورك هنا، خلّ القسم هذا واشتغل بالأزرار
-  اللي تحت. هذي ما ترسل شي لأي جهة، وما تبي حساب من الأصل.
+  اللي تحت.
 
 **Manual path preamble:** تأكد إن ستريميو مثبّت عندك. وإذا ما كنت مسجّل دخول بنفس الحساب في الجوال
-والتلفاز، انسخ روابط الإضافات اللي تحت والصقها على التلفاز وحدة وحدة. وكل إضافة لها زر يفتحها لك في
-ستريميو على طول.
+والتلفاز، انسخ روابط الإضافات اللي تحت والصقها على التلفاز وحدة وحدة.
 > NOTE: the sync claim stays conditional on purpose (§1), so an edge case in syncing cannot make the sentence false.
 
 **Steps heading:** الإضافات السبع
@@ -324,8 +328,7 @@ written from, so the two can be compared after any future edit.
 1. صفوف Netflix و Disney+ و Prime و Apple TV+ و HBO Max، أفلام ومسلسلات.
 2. مسلسلات آسيوية مترجمة: كوري وصيني وياباني وتايلندي.
 3. مصادر تشاهد منها الأفلام والمسلسلات.
-4. مصادر زيادة، وفيها صفوف قنوات مباشرة. بعض ملفاتها تتكرر مع الخطوة الثالثة، يعني نفس الملف يمكن يجيك
-   مرتين.
+4. مصادر زيادة، وفيها صفوف قنوات مباشرة. ويمكن يجيك نفس الملف مرتين.
 5. صفوف الأنمي وتفاصيله.
 6. ترجمة عربية للأفلام والمسلسلات.
 7. مصادر سريعة، وتبي لها رمز خاص لك.
@@ -336,15 +339,15 @@ written from, so the two can be compared after any future edit.
 1. افتح محادثة البوت في تيليجرام. (control: افتح البوت)
 2. أرسل له الأمر /token.
 3. بيجيك رمز. انسخه.
-4. الصقه في الحقل اللي تحت، وبعدها اضغط زر الإضافة.
+4. الصقه في الحقل اللي تحت.
 
-**QR caption:** أو امسح هالرمز بكاميرا جوالك. المسح يفيدك لما تكون الصفحة قدامك على التلفاز أو اللابتوب.
+**QR caption:** أو امسح هالرمز بكاميرا جوالك.
 
 **Bot fallback:** إذا البوت ما رد، ادخل سيرفر PenguPlay على ديسكورد، واكتب نفس الأمر هناك.
 
 **Token field:** label الرمز · placeholder الصق الرمز هنا · hint الرمز يطول عادة، تأكد إنك نسخته كامل.
 
-**Privacy line:** متصفحك يبني الرابط هنا، وما يرسل الرمز لأي جهة.
+**Privacy line:** ما نرسل رمزك لأي جهة.
 
 **Empty state:** ما لصقت رمز للحين.
 
@@ -353,23 +356,17 @@ written from, so the two can be compared after any future edit.
 **Recovery heading:** إذا اختفى صف أو فرغت إضافة
 
 **Recovery body:** يصير هذا لما يغيّر المصدر عنوانه أو إعداداته. افتح هذي الصفحة، وأعد إضافة الصف اللي
-اختلّ لحاله. وفي ستريميو، ما يكفي تشيل الإضافة وتحطها من جديد، لأنه ما يقرأ الإعدادات مرة ثانية؛ الصق
-الرابط في خانة «رابط مستودع الإضافات» عشان يحمّلها من جديد.
-
-**Recovery honesty line:** هذي صفحة ثابتة، ما توصل لإضافاتك من بعيد. الإصلاح بيدك، وخطواته فوق.
+اختلّ لحاله. وفي ستريميو، لا تشيل الإضافة وتحطها من جديد؛ الصق الرابط في خانة «رابط مستودع الإضافات»
+عشان يحمّلها من جديد.
 
 **FAQ (questions worth asking about this product, not a template):**
 
 | Question | Answer |
 |---|---|
-| يبي لها حساب ستريميو وكلمة مرور؟ | تسجيلك بحسابك أسرع طريقة، وتنضاف بها كلها مرة وحدة. وإذا ما تبغى تكتب حسابك، الأزرار اللي تحت تضيفها بدون حساب، وما ترسل شي لأي جهة. وفي الحالتين ما يمر شي من عندنا، لأن الصفحة ما عندها خادم. |
-| وش يصير لإيميلي وكلمة مروري؟ | يقراهم متصفحك، ويرسلهم في طلب واحد إلى api.strem.io، وهو خادم ستريميو نفسه. ما يمرون على خادم عندنا، لأننا ما عندنا خادم من الأصل، ولا نحفظهم في جهازك، والحقلين ينمسحون بعد كل محاولة. |
-| ليش سبع إضافات وما فيه رابط واحد يجمعها؟ | لأن رابط واحد يجمعها يبي له خادم شغّال على مدار الساعة، وحنا ما نبغى نقف بينك وبين المصادر. ولو تبغى تجمعها كلها، تقدر بدون خادم: سجّل دخولك من فوق مرة وحدة. |
-| تشتغل على التلفاز؟ | إيه. وإذا سجّلت دخولك بنفس الحساب في الجوال والتلفاز، أضفتها مرة وحدة من الجوال ووصلت له. وإذا ما سجّلت، تنسخ كل رابط وتلصقه على التلفاز. |
-| وش يصير للرمز اللي ألصقه؟ | يدخل في الرابط اللي تضيفه لستريميو، ويظل في جهازك. |
+| يبي لها حساب ستريميو وكلمة مرور؟ | تسجيلك بحسابك أسرع طريقة، وتنضاف بها كلها مرة وحدة. وإذا ما تبغى تكتب حسابك، الأزرار اللي تحت تضيفها بدون حساب. |
+| تشتغل على التلفاز؟ | إيه. ولو سجّلت دخولك بنفس الحساب في الجوال والتلفاز، تنضاف من الجوال وتوصل للتلفاز. |
 
-**Footer:** عمو ستريميو. ما عندنا خادم، ولا نحفظ شي. الأزرار تشتغل في متصفحك لحاله، والتسجيل بحسابك
-يخاطب ستريميو مباشرة.
+**Footer:** عمو ستريميو. ما نحفظ شي عنك.
 
 ## 8. States
 
@@ -525,7 +522,15 @@ plan level, and what is not:
   send nothing", the FAQ answer that the page never asks for a password, and the FAQ that explained
   the missing single link with "it would need a server". The page now names the one part that sends
   something and where it goes, and `pages.yml` fails the build on a hidden request channel so the
-  narrower claim stays checkable.
+  narrower claim stays checkable. The 2026-10-16 trim (§7) then deleted two of those rewritten answers
+  outright: once the line above the fields says where a credential goes, a FAQ row repeating it is
+  words the reader pays for and gains nothing from. The third survives in shortened form.
+- **The 2026-10-16 trim, as a gate item:** the copy pass that removed every sentence describing how the
+  page works rather than what the reader gets (§7 records the rule and the strings). It is listed here
+  because it cuts against the honesty concern above: what came out was plumbing, the sync mechanism,
+  the field clearing, the quote stripping, and three FAQ answers about the site's own architecture.
+  What stayed is every claim that tells a reader something they need, including the one line that says
+  where a typed credential goes.
 - **R-36, the register change:** every string a reader sees moved to the Saudi dialect on the owner's
   instruction (§7, §12). The Arabic skill the copy was originally written to defends فصحى and names
   loose colloquial prose as a fault, so this is recorded as a deliberate departure with its cost named

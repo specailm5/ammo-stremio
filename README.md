@@ -69,6 +69,11 @@ field strips surrounding quotes and whitespace before the value is used, and it 
 `undefined` with the reason it appears rather than sending it as a key. The shipped wording is in
 `docs/PLAN-C.md` section 7, and the verification is in section 16.
 
+Copy rule for every string a reader sees: a sentence earns its place only if it changes what the reader
+does or knows. Nothing that describes the plumbing ships, so phrases such as how a pasted value is
+cleaned, that the fields are cleared afterwards, or why the site has no single combined link are kept in
+this README and in `docs/PLAN-C.md` rather than on the page. Section 7 records the pass that applied it.
+
 ## Regenerating assets
 
 Both scripts are idempotent and fetch from upstream at build time. The published page never touches
