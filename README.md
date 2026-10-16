@@ -6,6 +6,9 @@ recurring cost. The page leads with a sign-in path that writes every addon in on
 back to one button per addon for a reader who will not sign in. The only thing either path talks to is
 Stremio's own API.
 
+Live at <https://specailm5.github.io/ammo-stremio/>. Repository: <https://github.com/specailm5/ammo-stremio>.
+The Pages source is already set to GitHub Actions, so a push to `main` that touches `web/**` deploys.
+
 The copy ships in the **Saudi dialect**, on the owner's instruction. `docs/PLAN-C.md` section 7 holds
 the deck it was written from, and section 12 the reason and what the choice costs.
 
@@ -114,4 +117,6 @@ publishing, because branch publishing only serves `/` or `/docs` and `docs/` hol
 workflow refuses off-origin subresources, CDN references, and hidden request channels before it
 deploys anything, and it pins the one API endpoint to Stremio's.
 
-Set the repository's Pages source to **GitHub Actions** once, then push to `main`.
+Set the repository's Pages source to **GitHub Actions** once, then push to `main`. The pinned action
+versions are the current majors (checkout v7, configure-pages v6, upload-pages-artifact v5,
+deploy-pages v5); the earlier pins ran on Node 20, which GitHub is retiring, and the run log said so.

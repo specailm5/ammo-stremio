@@ -21,10 +21,9 @@ jobs:
   guard:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       # The page claims it sends nothing anywhere. That claim is only worth making
       # while it is enforced, so a subresource pointing off-origin fails the build.
+      - uses: actions/checkout@v7
       - name: Refuse off-origin subresources
         run: |
           if grep -nE '<(script|img)[^>]+src="https?://|<link[^>]+href="https?://' web/index.html; then
@@ -83,10 +82,10 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: web
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
