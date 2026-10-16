@@ -183,8 +183,18 @@ with `id: com.penguplay`. That `id` is the check that matters, because the addon
 a config it dislikes.
 
 One format question was settled at the same time, since a wrong answer would have baked a dead button
-into all seven cards: the install link is `stremio://install?url=<percent-encoded manifest URL>`, which
-is the form the official SDK prints as its own install command. Device confirmation is still M3.
+into all seven cards. The install link is the manifest URL with its scheme swapped, nothing more:
+`https://host/path/manifest.json` becomes `stremio://host/path/manifest.json`
+(`stremio-addon-sdk/docs/deep-links.md`). The `stremio://install?url=<encoded URL>` form that some SDK
+examples print is **not** a deep link the desktop shell understands: it reads `install` as the host,
+builds `https://install/`, and fails with "Failed to fetch".
+
+The corrected form was confirmed on a device on 2026-10-16: firing
+`stremio://7a82163c306e-stremio-netflix-catalog-addon.baby-beamup.club/manifest.json` at the Windows
+protocol handler installed the addon, and the next read of Stremio's own store showed
+`pw.ers.netflix-catalog` in the collection. What the same fix does not cover yet is a manifest URL
+carrying a query string, which no captured config produces today, and the same click on a phone and
+on a television, which stays in M3.
 
 ## 7. Copy deck (Arabic)
 

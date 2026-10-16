@@ -132,9 +132,17 @@ function penguConfig(token) {
   return config;
 }
 
-/* The form the SDK itself prints as its install command. Verified on a device in M3. */
+/*
+ * A Stremio deep link is the manifest URL with the scheme swapped and nothing else:
+ * https://host/path/manifest.json becomes stremio://host/path/manifest.json
+ * (stremio-addon-sdk/docs/deep-links.md).
+ *
+ * The "stremio://install?url=..." form that some SDK examples print is not understood
+ * by the desktop shell: it reads "install" as the host, builds https://install/, and
+ * reports "Failed to fetch". Confirmed on Stremio 5 for Windows.
+ */
 function installLink(url) {
-  return `stremio://install?url=${encodeURIComponent(url)}`;
+  return url.replace(/^https?:\/\//, "stremio://");
 }
 
 function stepMarkup(step, number) {

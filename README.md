@@ -49,9 +49,14 @@ Arabic repertoire stays renderable even as the copy changes.
 sizes, and both themes. Serve the repository root and open it:
 
 ```
-python -m http.server 8766 --directory .
-# then http://localhost:8766/tools/viewports.html
+python tools/serve.py
+# site:      http://localhost:8766/web/
+# viewports: http://localhost:8766/tools/viewports.html
 ```
+
+`tools/serve.py` sends `Cache-Control: no-store`. Plain `python -m http.server` does not, and the
+browser then caches `app.js` on a heuristic, which is how an already-fixed bug looks unfixed for
+several minutes after an edit. If a fix seems not to apply, the answer is the cache, not the code.
 
 ## Deploying
 
