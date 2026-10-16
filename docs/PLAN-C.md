@@ -8,18 +8,23 @@ with no server, no database, no credentials, and no recurring cost.
 and nothing here runs at request time. The page builds install URLs in the browser and hands them
 to Stremio. `docs/DESIGN.md` holds the visual direction; this file holds everything else.
 
-**Status:** all seven sources captured and each proved by a manifest fetch (§6). The page ships with no
-disabled card. Still open: the PenguPlay token field has to be confirmed against a real token, which is
-M4, and the install click is confirmed on Windows only, so a phone and a television stay in M3. Costs
-verified. One open contradiction resolved, one flagged (§5).
+**Status:** all seven sources captured and each proved by a manifest fetch (§6). The page ships with
+no disabled card. It also ships an optional bulk shortcut built on Stremio's own account API, with its
+contract and its limits recorded in §16. Still open: the PenguPlay token field has to be confirmed
+against a real token, which is M4; the install click is confirmed on Windows only, so a phone and a
+television stay in M3; and the shortcut's happy path waits for one click by the account's owner, since
+testing it would write to their real addon list. Costs verified. One open contradiction resolved, one
+flagged (§5).
 
 ---
 
 ## 1. The honest pitch, and where the value actually is
 
-C's weakness from §16 is texture: seven separate installs, and no remote fix when an upstream
-breaks. The page cannot remove either. It can do one thing that changes the experience: **make seven
-installs feel like one procedure.**
+C has two weaknesses: seven separate installs, and no remote fix when an upstream breaks. The page
+cannot remove the second. The first it can now remove outright: the optional shortcut in §16 writes
+the whole collection in one request, so for a reader who has an account seven installs really do
+become one. For a reader who has none, the page does the next best thing and **makes seven installs
+feel like one procedure.**
 
 So the page is not a landing page with seven buttons. It is a numbered walkthrough with progress
 that persists, where each step carries exactly one action, and the one step that needs real work
@@ -39,11 +44,13 @@ nothing is blocked on it.
 
 ## 2. Scope guard
 
-In: one page, seven steps, the token flow, a recovery section, a real FAQ.
+In: one page, seven steps, the token flow, the optional bulk shortcut, a recovery section, a real FAQ.
 
-Out, deliberately: a search box, an account, a settings page, a "choose your sources" picker, a
-proxy, analytics, an addon of our own. Every one of those reintroduces the server or the
-configuration the whole option exists to avoid.
+Out, deliberately: a search box, a settings page, a "choose your sources" picker, a proxy, analytics,
+an addon of our own. Every one of those reintroduces the server or the configuration the whole option
+exists to avoid. The one thing that came back in is Stremio's own account, and only as an optional
+shortcut for the bulk install (§16). It changes no default, it adds no server, and the page still
+works without it.
 
 ## 3. Page structure, in order
 
@@ -57,9 +64,12 @@ configuration the whole option exists to avoid.
    install action, the copy-link fallback, and a "added it" mark that persists per device.
 5. **The token step (step seven).** The only step with an input, so it is expanded in place instead
    of being left as a bare card (§5).
-6. **Recovery.** What to do when a row empties, including Stremio's own reinstall trap (§9).
-7. **FAQ.** Four questions this product's users actually ask, all of them answered honestly (§8).
-8. **Footer.** Only links that exist.
+6. **The bulk shortcut.** Optional, and labelled as optional, because it is the only part of the page
+   that asks for a credential. It sits after the steps and never before them, so the account-free
+   path stays the first thing a reader meets (§16).
+7. **Recovery.** What to do when a row empties, including Stremio's own reinstall trap (§9).
+8. **FAQ.** Questions this product's users actually ask, all of them answered honestly (§7).
+9. **Footer.** Only links that exist, and a claim that matches what the page does.
 
 ## 4. The steps and the order
 
@@ -166,7 +176,7 @@ drift means it has to be run again:
 
 The captures go in one place, `web/app.js` as a `UPSTREAMS` array, which is the entire maintenance
 surface of this project. When an upstream rotates its format, that array is the one-line fix, and the
-cost of the fix is that every user must revisit the page (the trade-off from §16, restated in §9).
+cost of the fix is that every user must revisit the page (the trade-off in §9).
 
 ### Resolved in the capture pass (2026-10-16)
 
@@ -309,10 +319,22 @@ later reader can tell the two apart.
 
 | Question | Answer |
 |---|---|
-| هل تحتاج إلى حساب ستريميو وكلمة مروره؟ | لا. لا نطلب كلمة مرورك ولا نحتاجها. تُضاف الإضافات من جهازك مباشرة. |
-| لماذا سبع إضافات ولا إضافة واحدة تجمعهنّ؟ | لأن الجمع يحتاج خادماً يعمل على مدار الساعة. اخترنا ألا نقف بينك وبين المصادر، فبقيت سبعاً، ولا نحتاج خادماً ولا مالاً. |
+| هل تحتاج إلى حساب ستريميو وكلمة مروره؟ | في الأزرار أعلاه لا. تُضاف الإضافات من جهازك مباشرة، فلا نطلبك حساباً ولا كلمة مرور. وإن استعملت الطريق المختصر فأنت من يسجّل الدخول، ولا يمرّ شيء من عندنا لأن الصفحة بلا خادم. |
+| ما الذي يحدث لبريدي وكلمة مروري في الطريق المختصر؟ | يقرأهما متصفحك، ويرسلهما في طلب واحد إلى api.strem.io، وهو خادم ستريميو نفسه. لا يمرّان على خادم لنا، فلا خادم لنا أصلاً، ولا نحفظهما في جهازك، ويمحى الحقلان بعد كل محاولة. |
+| لماذا سبع إضافات ولا رابط واحد يجمعها؟ | لأن رابطاً واحداً يجمعها يحتاج خادماً يعمل على مدار الساعة، ولا نريد أن نقف بينك وبين المصادر، فبقيت سبعاً. وإن أردت جمعها كلها، فذلك ممكن بلا خادم: تسجّل الدخول في القسم السابق مرة واحدة. |
 | هل يعمل على التلفاز؟ | نعم. وإن سجّلت الدخول بالحساب نفسه في الجوال والتلفاز، أضفت الإضافات مرة واحدة على الجوال فوصلت إليه. وإن لم تسجّل، نسختَ كل رابط وألصقته على التلفاز. |
 | ما مصير الرمز الذي ألصقه؟ | يدخل في الرابط الذي تضيفه إلى ستريميو، ويبقى في جهازك. |
+
+**Bulk shortcut**, shipped in `web/index.html`. It is the only part of the page that sends anything,
+so its strings are held to the rule that they must stay true:
+
+- Heading: أو أضِفهنّ كلهنّ مرة واحدة
+- The line that carries the whole promise: هذه الفقرة وحدها هي التي ترسل شيئاً من هذه الصفحة، ويذهب
+  ما ترسله إلى ستريميو وحدها. لا خادم لنا، ولا نحتفظ بشيء، ويمحى الحقلان بعد كل محاولة.
+- Button: أضِفها إلى حسابي
+- The password-free door, for Facebook and Google accounts: حسابك عبر فيسبوك أو جوجل، فلا كلمة مرور له؟
+- The way out, kept beside the way in: إن لم ترتح إلى كتابة كلمة مرورك هنا، فاترك هذا القسم واعمل
+  بالأزرار أعلاه، فهي لا ترسل شيئاً إلى أي جهة، ولا تحتاج حساباً من الأصل.
 
 ## 8. States
 
@@ -417,8 +439,14 @@ states it conditionally (§1).
 - **Legal posture of the sources themselves.** This page links to addons that point at unlicensed
   streams. It hosts nothing and caches nothing, and it should stay a neutral installer: no bundled
   titles, no index, no promotion.
-- **No telemetry** means breakage is learned from user complaints. That is the price of the
-  "sends nothing anywhere" claim, and the claim is worth more here than the telemetry.
+- **No telemetry** means breakage is learned from user complaints. That is the price of having no
+  server and keeping nothing, and keeping nothing is worth more here than the telemetry.
+- **A credential on a community page.** The bulk shortcut is the one place a reader types a Stremio
+  password into a page that is not Stremio. It is optional, it comes after the account-free path, the
+  password goes only to `api.strem.io`, which is the same endpoint Stremio's own client posts to, and
+  nothing is stored. The residual risk is what it teaches: a reader who learns to type a Stremio
+  password into this page may type it into another one. That is why the card states that the buttons
+  above send nothing, and why the main feature still asks for no account at all.
 
 ## 15. antislop gate status for this document
 
@@ -443,6 +471,63 @@ plan level, and what is not:
   empty states, both exercised in the M2 pass.
 - **Pending:** the rest of the UI-side gate (R-03, R-32, R-34, R-35, and the liveliness block) because
   it runs at M6 against the finished page with a recorded click-through, not against a scaffold.
+- **R-36, the part the bulk shortcut changed:** adding that section made three shipped claims false,
+  and all three were rewritten in the same commit instead of being left standing: the footer's "we
+  send nothing", the FAQ answer that the page never asks for a password, and the FAQ that explained
+  the missing single link with "it would need a server". The page now names the one part that sends
+  something and where it goes, and `pages.yml` fails the build on a hidden request channel so the
+  narrower claim stays checkable.
+
+## 16. The bulk shortcut
+
+The owner asked for a second way to install, one that adds every addon at once. It is possible from
+a static page, and the reason it is possible is worth recording: Stremio's API answers cross-origin
+requests, measured rather than assumed, so the browser posts to it directly and no proxy appears.
+
+The contract is taken from Stremio's own client, `stremio-api-client`, not from a wiki:
+
+| call | body | returns |
+|---|---|---|
+| `POST api.strem.io/api/login` | `{email, password}` | `{authKey, user}` |
+| `POST api.strem.io/api/addonCollectionGet` | `{authKey, update, addFromURL}` | `{addons, lastModified}` |
+| `POST api.strem.io/api/addonCollectionSet` | `{authKey, addons}` | `{success}` |
+
+An entry is `{transportUrl, manifest, flags}`, which was read out of a real signed-in profile on
+disk rather than guessed, and the flow mirrors what Stremio does itself: fetch each manifest, then
+write the whole collection back.
+
+Two rules make it safe to offer, and both are enforced in code rather than promised in copy:
+
+- **Nothing is stored.** The password and the auth key live in one argument object for the length of
+  one request. They are never written to storage, never put in a URL, and the fields are cleared on
+  every path out of the handler, success or failure.
+- **The collection is merged, never replaced.** An addon already present, matched by manifest id or
+  by transport url, is left exactly as its owner set it up. The shortcut therefore cannot remove or
+  overwrite anything, which is the failure that would matter most.
+
+What was verified, and how:
+
+- **The endpoint is reachable from a page.** A `POST` to `login` from the served page came back `200`
+  with a real JSON body. A blocked CORS policy would have thrown instead.
+- **Every manifest is readable from the browser.** All six account-free addons served their manifests
+  cross-origin, which the addon protocol requires of them anyway.
+- **The write is accepted, and nothing moves.** `addonCollectionSet` was called with the exact
+  collection the server already held, a deliberate no-op: it returned `{success: true}` and a
+  re-read showed the same five addons. That proves the request shape without changing the account.
+- **The page's own flow, with only Stremio's three calls stubbed.** The account was seeded with two
+  foreign addons, one of them Kitsu. The run produced one write containing both originals in their
+  original order plus the five that were missing, skipped Kitsu as already present, left PenguPlay
+  out because no token had been pasted, and cleared the password field. Nothing credential-shaped
+  reached storage.
+
+Two things it deliberately does not do. It does not log in on a reader's behalf at any other time,
+so there is no session to leak between visits. And it does not overwrite an addon the reader already
+configured: if they have their own HdHub, the shortcuts reports it as kept and moves on, rather than
+replacing their settings with the curated ones.
+
+The honest limit: the shortcut's happy path has not been fired at a real account from the page,
+because that would write to the owner's real addon list. The write contract and the merge are each
+proven, and the remaining step is one click by whoever owns the account.
 
 One loose end: the existing `docs/PLAN.md` uses em dashes throughout, written before this rule was
 in play. Say the word and I sweep it in the same pass.

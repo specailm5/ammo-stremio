@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>عمو ستريميو · إضافات ستريميو جاهزة بضغطة واحدة</title>
-<meta name="description" content="سبع إضافات لستريميو بإعدادات مختارة سلفاً: أفلام ومسلسلات وأنمي وترجمة عربية. تُضاف بضغطة واحدة، بلا حساب وبلا خادم.">
+<meta name="description" content="سبع إضافات لستريميو بإعدادات مختارة سلفاً: أفلام ومسلسلات وأنمي وترجمة عربية. تُضاف بضغطة واحدة، أو كلها مرة واحدة إن كان لك حساب. بلا خادم.">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#12130F">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2312130F'/%3E%3Crect x='7' y='15' width='18' height='2' fill='%23E3A12B'/%3E%3C/svg%3E">
@@ -51,6 +51,9 @@ try {
       الإضافات إليه بلا عمل إضافي. وإن كنت تشاهد من غير حساب، فانسخ روابط الإضافات أدناه
       وألصقها على التلفاز واحدة واحدة.
     </p>
+    <p>
+      وإن كان لك حساب في ستريميو، فلك في آخر الصفحة طريق مختصر يضيفها كلها مرة واحدة.
+    </p>
   </section>
 
   <section>
@@ -70,6 +73,58 @@ try {
     </noscript>
   </section>
 
+  <section class="bulk" id="bulk">
+    <h2 class="section-head" id="bulk-heading" tabindex="-1">أو أضِفهنّ كلهنّ مرة واحدة</h2>
+    <p>
+      هذا طريق مختصر، وهو اختياري. تسجّل الدخول بحسابك في ستريميو، فيكتب متصفحك الإضافات كلها في
+      حسابك بطلب واحد، وتصل إلى تلفازك مع أول مزامنة.
+    </p>
+    <p class="bulk-warn">
+      هذه الفقرة وحدها هي التي ترسل شيئاً من هذه الصفحة، ويذهب ما ترسله إلى ستريميو وحدها. لا خادم
+      لنا، ولا نحتفظ بشيء، ويمحى الحقلان بعد كل محاولة.
+    </p>
+
+    <form class="bulk-form" id="bulk-form" novalidate>
+      <div class="field">
+        <label for="bulk-email">بريدك في ستريميو</label>
+        <input id="bulk-email" name="email" type="email" dir="ltr" inputmode="email"
+               autocomplete="email" autocapitalize="off" spellcheck="false"
+               placeholder="name@example.com">
+      </div>
+      <div class="field">
+        <label for="bulk-password">كلمة المرور</label>
+        <input id="bulk-password" name="password" type="password" dir="ltr"
+               autocomplete="off" spellcheck="false">
+      </div>
+      <p class="hint" data-bulk-hint>اكتب بريدك وكلمة مرورك، ثم اضغط الزرّ.</p>
+
+      <details class="bulk-alt">
+        <summary>حسابك عبر فيسبوك أو جوجل، فلا كلمة مرور له؟</summary>
+        <p>
+          هذان الحسابان لا يدخلان بكلمة مرور. افتح ستريميو، وابحث في إعدادات حسابك عن مفتاح الدخول
+          (Auth Key)، وانسخه والصقه هنا، لنستعمله بدل البريد وكلمة المرور.
+        </p>
+        <div class="field">
+          <label for="bulk-key">مفتاح الدخول</label>
+          <input id="bulk-key" name="authKey" type="password" dir="ltr"
+                 autocomplete="off" spellcheck="false" placeholder="الصق المفتاح هنا">
+        </div>
+      </details>
+
+      <div class="bulk-actions">
+        <button class="btn btn-primary" type="submit" id="bulk-run">أضِفها إلى حسابي</button>
+      </div>
+    </form>
+
+    <p class="bulk-status" id="bulk-status" role="status" aria-live="polite"></p>
+    <ul class="bulk-result" id="bulk-result" hidden></ul>
+
+    <p class="privacy">
+      إن لم ترتح إلى كتابة كلمة مرورك هنا، فاترك هذا القسم واعمل بالأزرار أعلاه، فهي لا ترسل شيئاً
+      إلى أي جهة، ولا تحتاج حساباً من الأصل.
+    </p>
+  </section>
+
   <section class="recovery">
     <h2 class="section-head">إن اختفى صف أو فرغت إضافة</h2>
     <p>
@@ -85,14 +140,27 @@ try {
 
     <details>
       <summary>هل تحتاج إلى حساب ستريميو وكلمة مروره؟</summary>
-      <p class="answer">لا. لا نطلب كلمة مرورك ولا نحتاجها. تُضاف الإضافات من جهازك مباشرة.</p>
+      <p class="answer">
+        في الأزرار أعلاه لا. تُضاف الإضافات من جهازك مباشرة، فلا نطلبك حساباً ولا كلمة مرور. وإن
+        استعملت الطريق المختصر فأنت من يسجّل الدخول، ولا يمرّ شيء من عندنا لأن الصفحة بلا خادم.
+      </p>
     </details>
 
     <details>
-      <summary>لماذا سبع إضافات ولا إضافة واحدة تجمعهنّ؟</summary>
+      <summary>ما الذي يحدث لبريدي وكلمة مروري في الطريق المختصر؟</summary>
       <p class="answer">
-        لأن الجمع يحتاج خادماً يعمل على مدار الساعة. اخترنا ألا نقف بينك وبين المصادر، فبقيت سبعاً،
-        ولا نحتاج خادماً ولا مالاً.
+        يقرأهما متصفحك، ويرسلهما في طلب واحد إلى <bdi dir="ltr">api.strem.io</bdi>، وهو خادم
+        ستريميو نفسه. لا يمرّان على خادم لنا، فلا خادم لنا أصلاً، ولا نحفظهما في جهازك، ويمحى
+        الحقلان بعد كل محاولة.
+      </p>
+    </details>
+
+    <details>
+      <summary>لماذا سبع إضافات ولا رابط واحد يجمعها؟</summary>
+      <p class="answer">
+        لأن رابطاً واحداً يجمعها يحتاج خادماً يعمل على مدار الساعة، ولا نريد أن نقف بينك وبين
+        المصادر، فبقيت سبعاً. وإن أردت جمعها كلها، فذلك ممكن بلا خادم: تسجّل الدخول في القسم
+        السابق مرة واحدة.
       </p>
     </details>
 
@@ -111,7 +179,10 @@ try {
   </section>
 
   <footer>
-    <p>عمو ستريميو. لا حساب، ولا خادم، ولا نرسل شيئاً: كل ما في هذه الصفحة يعمل في متصفحك.</p>
+    <p>
+      عمو ستريميو. لا خادم لنا ولا نحتفظ بشيء. الأزرار تعمل في متصفحك وحده، والطريق المختصر
+      يخاطب ستريميو مباشرة.
+    </p>
   </footer>
 
 </main>

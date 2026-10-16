@@ -16,6 +16,7 @@ const DISCORD_URL = "https://discord.gg/hhBs3ezNE3";
 const CATALOGS = "https://7a82163c306e-stremio-netflix-catalog-addon.baby-beamup.club";
 const KITSU = "https://anime-kitsu.strem.fun";
 const PENGU = "https://pengu.uk";
+const STREMIO_API = "https://api.strem.io/api";
 const DRAMAYO = "https://dramayo.stream";
 const HDHUB = "https://hdhub.thevolecitor.qzz.io";
 const FLIX = "https://free.flixnest.app";
@@ -232,6 +233,152 @@ function installLink(url) {
   return url.replace(/^https?:\/\//, "stremio://");
 }
 
+/*
+  The bulk path is the only part of this page that sends anything anywhere. It talks to
+  Stremio's own API and to nothing else. The three calls, and the descriptor shape below
+  them, are taken from Stremio's own client (stremio-api-client/apiClient.js):
+
+    login              { email, password }                -> { authKey, user }
+    addonCollectionGet { authKey, update, addFromURL }     -> { addons, lastModified }
+    addonCollectionSet { authKey, addons }
+
+  An entry in that collection is { transportUrl, manifest, flags }, which is also the
+  shape a real signed-in profile holds on disk.
+
+  Two properties matter more than the calls. Nothing is persisted: the password and the
+  auth key live in one argument object for the length of one request and are never
+  written to storage. And the collection is merged, never replaced, so an addon that is
+  already there is left exactly as its owner configured it, and nothing can be removed.
+*/
+function loginMessage(error) {
+  const text = String((error && error.message) || error || "");
+  const key = " وإن كان حسابك عبر فيسبوك أو جوجل، فاستعمل مفتاح الدخول في الأسفل.";
+  if (/user not found/i.test(text)) {
+    return "لا يوجد حساب في ستريميو بهذا البريد." + key;
+  }
+  if (/passphrase|password|incorrect|invalid/i.test(text)) {
+    return "البريد أو كلمة المرور غير صحيحة." + key;
+  }
+  if (/facebook|google|oauth|token|third/i.test(text)) {
+    return "هذا الحساب لا يدخل بكلمة مرور. افتح الخيار في الأسفل، والصق مفتاح الدخول.";
+  }
+  return `لم يقبل ستريميو الدخول: ${text}`;
+}
+
+function sessionMessage(error) {
+  const text = String((error && error.message) || error || "");
+  if (/session does not exist|expired|invalid/i.test(text)) {
+    return "مفتاح الدخول غير صحيح، أو انتهت صلاحيته. انسخه من جديد.";
+  }
+  return `لم نقرأ إضافاتك: ${text}`;
+}
+
+async function stremio(method, params, requireResult = true) {
+  let response;
+  try {
+    response = await fetch(`${STREMIO_API}/${method}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    });
+  } catch (error) {
+    throw new Error("تعذّر الوصول إلى ستريميو. تأكّد من اتصالك ثم أعد المحاولة.");
+  }
+  if (!response.ok) throw new Error(`ردّ ستريميو بخطأ ${response.status}.`);
+  let body;
+  try {
+    body = await response.json();
+  } catch (error) {
+    throw new Error("لم نفهم ردّ ستريميو.");
+  }
+  if (body.error) throw new Error(body.error.message || "رفض ستريميو الطلب.");
+  if (requireResult && !body.result) throw new Error("لم يصل ردّ من ستريميو.");
+  return body.result;
+}
+
+async function bulkAdd({ steps, credentials, onStatus }) {
+  let authKey = (credentials.authKey || "").trim();
+  if (!authKey) {
+    onStatus("نتحقق من حسابك في ستريميو…");
+    let login;
+    try {
+      login = await stremio("login", {
+        email: (credentials.email || "").trim(),
+        password: credentials.password || "",
+      });
+    } catch (error) {
+      throw new Error(loginMessage(error));
+    }
+    if (!login || !login.authKey) {
+      throw new Error("لم يرسل ستريميو مفتاح الدخول. تأكّد من البريد وكلمة المرور.");
+    }
+    authKey = login.authKey;
+  }
+
+  onStatus("نقرأ إضافاتك الحالية…");
+  let collection;
+  try {
+    collection = await stremio("addonCollectionGet", {
+      authKey,
+      update: true,
+      addFromURL: [],
+    });
+  } catch (error) {
+    throw new Error(sessionMessage(error));
+  }
+  const existing = Array.isArray(collection.addons) ? collection.addons : [];
+  const haveIds = new Set(existing.map((item) => (item.manifest || {}).id).filter(Boolean));
+  const haveUrls = new Set(existing.map((item) => item.transportUrl).filter(Boolean));
+
+  const added = [];
+  const skipped = [];
+  const failed = [];
+  const descriptors = [];
+
+  for (const [index, step] of steps.entries()) {
+    if (haveUrls.has(step.url)) {
+      skipped.push({ name: step.name, why: "موجودة عندك" });
+      continue;
+    }
+    onStatus(`نقرأ إعدادات ${step.name} (${index + 1} من ${steps.length})…`);
+    let manifest;
+    try {
+      const response = await fetch(step.url);
+      if (!response.ok) throw new Error(String(response.status));
+      manifest = await response.json();
+    } catch (error) {
+      failed.push({ name: step.name, why: "تعذّر قراءة إعداداتها" });
+      continue;
+    }
+    if (!manifest || !manifest.id) {
+      failed.push({ name: step.name, why: "ردّها غير مفهوم" });
+      continue;
+    }
+    if (haveIds.has(manifest.id)) {
+      skipped.push({ name: step.name, why: "عندك بإعداداتك" });
+      continue;
+    }
+    descriptors.push({
+      transportUrl: step.url,
+      manifest,
+      flags: { official: false, protected: false },
+    });
+    added.push({ name: step.name });
+  }
+
+  if (descriptors.length) {
+    onStatus("نكتبها في حسابك…");
+    await stremio(
+      "addonCollectionSet",
+      { authKey, addons: existing.concat(descriptors) },
+      false,
+    );
+  }
+
+  authKey = "";
+  return { added, skipped, failed };
+}
+
 function stepMarkup(step, number) {
   return `
     <div class="step-head">
@@ -425,6 +572,108 @@ function main() {
         render();
       });
     }
+  }
+
+  /*
+    The bulk form. The password and the auth key are read here, passed straight into one
+    request, and then the fields are cleared whether the attempt worked or not. Neither
+    value is put in storage, in the URL, or in the page's own output.
+  */
+  const bulkForm = document.getElementById("bulk-form");
+  if (bulkForm) {
+    const emailField = document.getElementById("bulk-email");
+    const passwordField = document.getElementById("bulk-password");
+    const keyField = document.getElementById("bulk-key");
+    const runButton = document.getElementById("bulk-run");
+    const status = document.getElementById("bulk-status");
+    const result = document.getElementById("bulk-result");
+    const hint = document.querySelector("[data-bulk-hint]");
+
+    bulkForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const authKey = keyField.value.trim();
+      const email = emailField.value.trim();
+      const password = passwordField.value;
+
+      if (!authKey && (!email || !password)) {
+        hint.textContent = "نحتاج بريدك وكلمة مرورك، أو مفتاح الدخول وحده.";
+        hint.classList.add("is-warning");
+        return;
+      }
+      hint.classList.remove("is-warning");
+
+      const steps = UPSTREAMS.map((step) => ({
+        id: step.id,
+        name: step.name,
+        url: urlFor(step),
+      })).filter((step) => step.url);
+
+      runButton.disabled = true;
+      result.hidden = true;
+      result.replaceChildren();
+      status.textContent = "";
+
+      try {
+        const outcome = await bulkAdd({
+          steps,
+          credentials: { email, password, authKey },
+          onStatus: (text) => {
+            status.textContent = text;
+          },
+        });
+
+        passwordField.value = "";
+        keyField.value = "";
+
+        for (const step of steps) {
+          const broke = outcome.failed.some((item) => item.name === step.name);
+          if (!broke) done.add(step.id);
+        }
+        store.set(STORE_STEPS, [...done]);
+        render();
+
+        const lines = [];
+        if (outcome.added.length) {
+          lines.push(`أُضيفت: ${outcome.added.map((item) => item.name).join("، ")}.`);
+        }
+        if (outcome.skipped.length) {
+          lines.push(
+            `تركناها كما هي: ${outcome.skipped
+              .map((item) => `${item.name} (${item.why})`)
+              .join("، ")}.`,
+          );
+        }
+        if (outcome.failed.length) {
+          lines.push(
+            `تعذّرت: ${outcome.failed
+              .map((item) => `${item.name} (${item.why})`)
+              .join("، ")}.`,
+          );
+        }
+        for (const line of lines) {
+          const item = document.createElement("li");
+          item.textContent = line;
+          result.appendChild(item);
+        }
+        result.hidden = lines.length === 0;
+
+        if (outcome.added.length) {
+          status.textContent = "تمّ. افتح ستريميو، وستجدها في «إضافاتي».";
+        } else if (outcome.failed.length) {
+          status.textContent = "لم تكتمل. أعد المحاولة بعد قليل.";
+        } else if (outcome.skipped.length) {
+          status.textContent = "كلها عندك، فلم نغيّر شيئاً.";
+        } else {
+          status.textContent = "لم نجد ما نضيفه.";
+        }
+      } catch (error) {
+        passwordField.value = "";
+        status.textContent = error.message;
+      } finally {
+        runButton.disabled = false;
+      }
+    });
   }
 
   function applyTheme(mode) {

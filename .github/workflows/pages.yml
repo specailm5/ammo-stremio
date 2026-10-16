@@ -41,6 +41,31 @@ jobs:
           fi
           echo "Site shell is self-contained."
 
+      # The page makes two kinds of outbound call, and both are visible in the source:
+      # reading an addon manifest, and the three Stremio calls the shortcut needs. A
+      # second, quieter channel would make the page weaker than its own copy claims, so
+      # those channels fail the build.
+      - name: Refuse hidden request channels
+        run: |
+          if grep -nEi 'XMLHttpRequest|sendBeacon|new WebSocket|EventSource|importScripts|<iframe|serviceWorker|eval\(' web/app.js web/index.html; then
+            echo "::error::A hidden request or eval channel found in the site shell."
+            exit 1
+          fi
+          echo "No hidden request channels."
+
+      # Stremio's own API is the only off-origin endpoint the page may post to.
+      - name: Pin the API endpoint to Stremio's
+        run: |
+          test "$(grep -c 'https://api.strem.io/api' web/app.js)" -eq 1 || {
+            echo "::error::Expected exactly one api.strem.io reference, in STREMIO_API."
+            exit 1
+          }
+          grep -qF 'const STREMIO_API = "https://api.strem.io/api";' web/app.js || {
+            echo "::error::STREMIO_API is not the expected Stremio endpoint."
+            exit 1
+          }
+          echo "The only API endpoint is Stremio's."
+
       - name: Confirm the committed assets are present
         run: |
           for file in web/assets/penguplay-qr.png \
