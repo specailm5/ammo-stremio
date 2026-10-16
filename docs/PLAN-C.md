@@ -8,8 +8,10 @@ with no server, no database, no credentials, and no recurring cost.
 and nothing here runs at request time. The page builds install URLs in the browser and hands them
 to Stremio. `docs/DESIGN.md` holds the visual direction; this file holds everything else.
 
-**Status:** reconnaissance done for two of seven sources; the other five need a config capture pass
-(M1). Costs verified. One open contradiction resolved, one flagged (§5).
+**Status:** all seven sources captured and each proved by a manifest fetch (§6). The page ships with no
+disabled card. Still open: the PenguPlay token field has to be confirmed against a real token, which is
+M4, and the install click is confirmed on Windows only, so a phone and a television stay in M3. Costs
+verified. One open contradiction resolved, one flagged (§5).
 
 ---
 
@@ -68,11 +70,11 @@ reader who stops early still has a working Stremio.
 | # | Source | What the card says it gives | Config baked | Verified |
 |---|---|---|---|---|
 | 1 | Streaming Catalogs | Netflix, Disney+, Prime, Apple TV+, HBO Max rows, films and series | none needed, the bare URL already serves those five services | yes, 10 boards |
-| 2 | Dramayo | Subtitled Asian series: Korean, Chinese, Japanese | curated `enabledCatalogs` | no, capture in M1 |
-| 3 | HdHub | Watch sources for films and series | curated `catalogs`, `content`, `qualities` | no, capture in M1 |
-| 4 | Flix-Streams | Extra watch sources, including live channel rows | curated config | no, capture in M1 |
+| 2 | Dramayo | Subtitled Asian series: Korean, Chinese, Japanese | curated `enabledCatalogs`, all 16 | yes, 16 boards |
+| 3 | HdHub | Watch sources for films and series | curated `catalogs`, `qualities`, `sort` | yes, 4 boards, quality-proved |
+| 4 | Flix-Streams | Extra watch sources, including live channel rows | none needed, the bare URL matches its own default config | yes, 2 boards, 40 live events |
 | 5 | Anime Kitsu | Anime rows and details | none exists, 6 fixed boards | n/a |
-| 6 | OpenSubtitles PRO | Arabic subtitles | `langs: ["arabic"]` | no, capture in M1 |
+| 6 | OpenSubtitles PRO | Arabic subtitles | `langs: ["arabic"]` | yes, 43 Arabic subtitles |
 | 7 | PenguPlay | Fast watch sources, needs a personal token | `auth_token`, sources, qualities | partly, see §5 |
 
 Two consequences worth writing down now:
@@ -149,15 +151,18 @@ visible streams.
 
 ## 6. What still needs capturing (M1)
 
-The five unverified configs are mechanical to obtain, and the procedure is the same for each:
+The configs are mechanical to obtain, and the procedure is the same for each, which matters because
+drift means it has to be run again:
 
-1. Open the upstream's configure page and read the config schema out of it (that is how the
-   PenguPlay keys above were found, from the page's own `buildConfig` function).
+1. Open the upstream's configure page and read the config schema out of it (that is how the PenguPlay
+   keys were found, from the page's own `buildConfig` function).
 2. Choose a curated value for each field and write the JSON.
-3. Base64url-encode it, fetch the resulting `manifest.json`, and **count what comes back**. A curated
-   config is only accepted once the manifest proves it, the way the Streaming Catalogs config proved
-   5 services and 10 boards.
-4. Record the verified string in the table in §4.
+3. Encode it **the way that page's own code encodes it**, then fetch the resulting `manifest.json` and
+   **count what comes back**. A curated config is only accepted once the manifest proves it. Do not
+   assume base64url: of the four captured in §6, one uses plain `btoa`, one uses url-safe base64 with
+   the padding stripped, one uses standard base64, and one ships its config compressed and needs none.
+4. Record the verified string in the table in §4, and re-check a new board id against the fetched
+   manifest if it holds a character outside letters, digits, and `- _ : , [ ] { } "`.
 
 The captures go in one place, `web/app.js` as a `UPSTREAMS` array, which is the entire maintenance
 surface of this project. When an upstream rotates its format, that array is the one-line fix, and the
@@ -171,11 +176,11 @@ points each card at its base.
 | Source | Base | Card state |
 |---|---|---|
 | Streaming Catalogs | `https://7a82163c306e-stremio-netflix-catalog-addon.baby-beamup.club` | captured, bare `manifest.json`, 10 boards |
-| Dramayo | `https://dramayo.stream` | pending, `enabledCatalogs` |
-| HdHub | `https://hdhub.thevolecitor.qzz.io` | pending, `catalogs`, `content`, `qualities` |
-| Flix-Streams | `https://free.flixnest.app` | pending, config unknown until captured |
+| Dramayo | `https://dramayo.stream` | captured, `btoa` of JSON, 16 boards |
+| HdHub | `https://hdhub.thevolecitor.qzz.io` | captured, unpadded url-safe base64, 4 boards |
+| Flix-Streams | `https://free.flixnest.app` | captured, the bare URL is the config, 2 boards |
 | Anime Kitsu | `https://anime-kitsu.strem.fun` | captured, and no configure page exists |
-| OpenSubtitles PRO | `https://opensubtitlesv3-pro.dexter21767.com` | pending, `langs: ["arabic"]` |
+| OpenSubtitles PRO | `https://opensubtitlesv3-pro.dexter21767.com` | captured, standard base64, 43 Arabic subtitles |
 | PenguPlay | `https://pengu.uk/<base64url>` | captured, encoder proved end to end |
 
 The PenguPlay encoder is proved rather than assumed: the page's own output, fetched back, returns `200`
@@ -195,6 +200,43 @@ protocol handler installed the addon, and the next read of Stremio's own store s
 `pw.ers.netflix-catalog` in the collection. What the same fix does not cover yet is a manifest URL
 carrying a query string, which no captured config produces today, and the same click on a phone and
 on a television, which stays in M3.
+
+### The four remaining configs, each with its own encoder (2026-10-16)
+
+The four cards that rendered disabled were not blocked on a decision. They were blocked on a capture
+pass, and the pass is done. The encodings differ per project, because each project wrote its own
+configure page, so each config is built the way its own page builds it. All four manifests now answer
+`200`, and each field is accepted only on evidence:
+
+| Source | Encoder, read out of its own page | Evidence the config took effect |
+|---|---|---|
+| Dramayo | `btoa(JSON.stringify(cfg))` in the path | asking for 2 of the 16 boards returned 4, so `enabledCatalogs` is honoured. All 16 returns 16, and an empty list also returns 16, which makes empty mean "everything" rather than "nothing" |
+| HdHub | `btoa` then `+`→`-`, `/`→`_`, padding stripped, the same form as PenguPlay | `qualities: "2160p"` returned boards named `4KHDHub 4K`, `qualities: "480p"` returned `HdHub 480p`, and `catalogs: "featured"` halved the board count. The field names come from the page's own `configObj` builder |
+| Flix-Streams | none | the bare URL and the publisher's own default blob returned the identical 8 streams and the same 40 live events, so the bare URL is the curated config and no schema is pinned |
+| OpenSubtitles PRO | `Buffer.from(...).toString("base64")`, standard base64 | `langs: ["arabic"]` returned 43 subtitles, every one `ara`, while `langs: ["english"]` returned 122 `eng`. The bare URL answers `500`, so this card cannot use one |
+
+Three findings from that pass are worth keeping, because each one would have shipped broken:
+
+- **OpenSubtitles PRO needs a config.** Its bare manifest URL answers `500`. A card pointing at the
+  bare URL would have been a dead button on the page, and it would have looked like a Stremio fault.
+- **Flix-Streams needs no config.** Its path carries base64 of zlib-compressed JSON, which a page with
+  no runtime dependencies should not have to reproduce. It does not have to: the bare URL behaves
+  identically to the publisher's default blob, so there is nothing to encode and no `_free_schema`
+  version to go stale.
+- **Dramayo's install id is per browser.** Its page stores one in `localStorage` and counts installs
+  with it, so ours is generated once per browser and kept, which keeps the upstream's count honest
+  without a server. The payload also cannot contain `/` or `+`: a `/` needs a byte of `0x3F` or `0x7F`
+  and a `+` needs `0x3E` or `0x7E`, and no character in this JSON produces one. Measured as well as
+  reasoned: 0 of 2000 random ids produced either. A future board id holding `~` or `?` would end that,
+  so a new id has to be re-checked against the fetched manifest.
+
+What the pass cannot prove, stated so nobody reads more into it than is there. A few fields only affect
+which streams come back, not the manifest, so they are accepted and not measured: Dramayo's `hideAnime`
+and `hideNsfw`, HdHub's `sort`, and OpenSubtitles' `source` and `aiTranslated`. Each sits in the same
+object as fields that are proved, and each is the upstream's own default, so nothing is guessed. Two
+curation choices ride on that: NSFW stays visible because hiding it is a content decision and not the
+page's to make, and HdHub's `qualities` is `"all"` so a slow Firestick still gets a low-bitrate file to
+fall back to.
 
 ## 7. Copy deck (Arabic)
 
@@ -351,7 +393,7 @@ be verified before that copy is written.
 | # | Milestone | Done when |
 |---|---|---|
 | M0 | Recon | Done. 2 of 7 configs verified, token field identified, palette contrast computed, skills read. |
-| M1 | Verify assumptions, capture configs | Hosts and two configs resolved (see §6); the 4 remaining configs captured and each proved by a manifest fetch that returns the expected boards; the token field confirmed against a real token. |
+| M1 | Verify assumptions, capture configs | Done. Every upstream captured and each proved by a manifest fetch that returns the expected boards: 16, 4, and 2 boards, plus 43 Arabic subtitles (§6). The token field is still checked against a real token in M4. |
 | M2 | Shell | Done. `web/` renders in both themes, no horizontal overflow from 305px to desktop, every control at least 44px, design tokens ported from `docs/DESIGN.md`, `git init` and first commit. The layout has exactly two states, phone at 480px and below, and a single column capped at 44rem above it, so phone and desktop cover tablet. |
 | M3 | Steps | Seven cards, deep links open Stremio on a real device, copy fallback works where the clipboard API is absent, progress persists across reloads. |
 | M4 | Token step | A real token produces a working PenguPlay install with visible streams; bot-unreachable path shows the fallback. |
@@ -359,11 +401,10 @@ be verified before that copy is written.
 | M6 | Deploy and gate | Live on Pages; checked on a real phone and a real TV; the full antislop Delivery Gate run on the built page with recorded click-through. |
 | M7 | Later | Test whether a bakeable AIOStreams config can collapse steps 3, 4, and 7 into one, which would cut the page to five installs. Not before M6. |
 
-M1's real gate is the config capture: until the five remaining upstream configs are captured, and each
-is proved by a manifest fetch that returns the expected boards, steps 1 through 6 are placeholder
-strings rather than installs. The token field is the other testable item, and it is one string if the
-guess is wrong. The device-sync question no longer gates anything, because the copy states it
-conditionally (§1).
+M1 is closed on the config front: every upstream is captured and proved, so steps 1 through 6 are real
+installs rather than placeholder strings. The token field is the one item still open, and it is one
+string if the guess is wrong. The device-sync question no longer gates anything, because the copy
+states it conditionally (§1).
 
 ## 14. Risks, stated plainly
 

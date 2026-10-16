@@ -16,9 +16,14 @@ const DISCORD_URL = "https://discord.gg/hhBs3ezNE3";
 const CATALOGS = "https://7a82163c306e-stremio-netflix-catalog-addon.baby-beamup.club";
 const KITSU = "https://anime-kitsu.strem.fun";
 const PENGU = "https://pengu.uk";
+const DRAMAYO = "https://dramayo.stream";
+const HDHUB = "https://hdhub.thevolecitor.qzz.io";
+const FLIX = "https://free.flixnest.app";
+const OPENSUBS = "https://opensubtitlesv3-pro.dexter21767.com";
 
 const STORE_STEPS = "ammo.steps";
 const STORE_THEME = "ammo.theme";
+const STORE_INSTALL = "ammo.installId";
 
 /*
   PenguPlay's own defaults are broad, so this is the curated set: the scrapers plus
@@ -32,6 +37,36 @@ const PENGU_SOURCES = [
   "source_moviesdrives",
   "source_2peckle",
   "source_miruro",
+];
+
+/*
+  Dramayo puts the whole configuration in the path as JSON, and its own page encodes
+  that JSON with btoa. The install id it stores is per browser, so ours is generated
+  once and kept, which keeps the upstream's install count honest without a server.
+
+  A base64 payload can hold "/" and "+", and either one inside a path would break the
+  link. Neither can appear here: a "/" needs a byte of 0x3F or 0x7F and a "+" needs
+  0x3E or 0x7E, and the characters this JSON can contain are letters, digits and
+  - _ : , [ ] { } ". Adding a catalog whose id holds "~" or "?" would end that, so a
+  new catalog id has to be checked against the fetched manifest before it ships.
+*/
+const DRAMAYO_CATALOGS = [
+  "dramayo-discover",
+  "dramayo-discover-movies",
+  "dramayo-korean",
+  "dramayo-chinese",
+  "dramayo-japanese",
+  "dramayo-thai",
+  "dramayo-taiwanese",
+  "dramayo-filipino",
+  "dramayo-hongkong",
+  "dramayo-korean-movies",
+  "dramayo-chinese-movies",
+  "dramayo-japanese-movies",
+  "dramayo-thai-movies",
+  "dramayo-taiwanese-movies",
+  "dramayo-filipino-movies",
+  "dramayo-hongkong-movies",
 ];
 
 /*
@@ -54,16 +89,18 @@ const UPSTREAMS = [
   {
     id: "dramayo",
     name: "Dramayo",
-    gives: "مسلسلات آسيوية مترجمة: كورية وصينية ويابانية.",
-    proof: "config capture pending",
-    ready: false,
+    gives: "مسلسلات آسيوية مترجمة: كورية وصينية ويابانية وتايلاندية.",
+    proof: "16 boards; asking for 2 of them returned 4, so the field is honoured, 2026-10-16",
+    ready: true,
+    url: () => `${DRAMAYO}/${encodeConfig(dramayoConfig())}/manifest.json`,
   },
   {
     id: "hdhub",
     name: "HdHub",
     gives: "مصادر مشاهدة للأفلام والمسلسلات.",
-    proof: "config capture pending",
-    ready: false,
+    proof: "4 boards; qualities=2160p returned 4KHDHub 4K and qualities=480p returned HdHub 480p, 2026-10-16",
+    ready: true,
+    url: () => `${HDHUB}/${encodeConfig(hdhubConfig())}/manifest.json`,
   },
   {
     id: "flix",
@@ -71,8 +108,9 @@ const UPSTREAMS = [
     gives:
       "مصادر مشاهدة إضافية، وفيها صفوف قنوات مباشرة. بعض ملفاتها تتكرر مع الخطوة الثالثة، " +
       "فالملف نفسه قد يظهر مرتين.",
-    proof: "config capture pending",
-    ready: false,
+    proof: "the bare url returns the same 8 streams and 40 live events as the publisher's own default blob, 2026-10-16",
+    ready: true,
+    url: () => `${FLIX}/manifest.json`,
   },
   {
     id: "kitsu",
@@ -86,8 +124,9 @@ const UPSTREAMS = [
     id: "opensubs",
     name: "OpenSubtitles PRO",
     gives: "ترجمة عربية للأفلام والمسلسلات.",
-    proof: "config capture pending",
-    ready: false,
+    proof: "43 Arabic subtitles under langs=[arabic]; the bare url answers 500, 2026-10-16",
+    ready: true,
+    url: () => `${OPENSUBS}/${encodeConfig(opensubsConfig())}/manifest.json`,
   },
   {
     id: "pengu",
@@ -130,6 +169,54 @@ function penguConfig(token) {
   const config = { auth_token: token };
   for (const key of PENGU_SOURCES) config[key] = "on";
   return config;
+}
+
+/*
+  Captured from each addon's own configure page on 2026-10-16 and proved by fetching
+  the resulting manifest. The encodings differ per project, so each one is built the
+  way its own page builds it:
+
+  Dramayo    btoa(JSON), install id generated once per browser.
+  HdHub      unpadded url-safe base64, which is what encodeConfig already emits.
+  Flix       base64 of zlib-compressed JSON, but its bare url behaves the same as its
+             own default blob, so there is nothing to encode and no schema to pin.
+  OpenSubs   standard base64, the code that writes the manifest url is Buffer.from(...)
+             .toString("base64"), and this payload carries no "+" or "/" or padding,
+             so encodeConfig emits the identical string.
+*/
+function installId() {
+  const saved = store.get(STORE_INSTALL, "");
+  if (saved) return saved;
+  const fresh =
+    window.crypto && window.crypto.randomUUID
+      ? window.crypto.randomUUID()
+      : Date.now().toString(36) + Math.random().toString(36).slice(2);
+  store.set(STORE_INSTALL, fresh);
+  return fresh;
+}
+
+function dramayoConfig() {
+  return {
+    installId: installId(),
+    enabledCatalogs: DRAMAYO_CATALOGS,
+    /*
+      Both filters stay as the upstream ships them. Hiding NSFW is a content decision,
+      not a technical one, so it is left to the addon's own default rather than made
+      here on the reader's behalf.
+    */
+    hideAnime: false,
+    hideNsfw: false,
+  };
+}
+
+function hdhubConfig() {
+  /* torbox empty means no debrid key, which is the point: one click, nothing to paste. */
+  return { torbox: "", qualities: "all", sort: "desc", catalogs: "featured,popular" };
+}
+
+function opensubsConfig() {
+  /* source and aiTranslated change nothing for Arabic, so they stay at upstream defaults. */
+  return { langs: ["arabic"], source: "all", aiTranslated: true, autoAdjustment: false };
 }
 
 /*
