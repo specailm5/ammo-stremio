@@ -284,7 +284,16 @@ written from, so the two can be compared after any future edit.
 - Button: أضفها لحسابي
 - Labels: إيميلك في ستريميو · كلمة المرور · مفتاح الدخول
 - Hint: اكتب إيميلك وكلمة المرور، وبعدها اضغط الزر.
-- The password-free door, for Facebook and Google accounts: حسابك على فيسبوك أو قوقل، وما له كلمة مرور؟
+- The password-free door, kept for Facebook and Google accounts and useful to anyone who would rather
+  not type a password. Those accounts have no other way in, so it is a full procedure and not a hint.
+  Summary: بغيت تدخل بمفتاح بدل كلمة المرور؟ The five steps in order: افتح web.stremio.com وسجّل دخولك
+  بحسابك · افتح كونسول المتصفح: اضغط F12، أو Ctrl+Shift+J · أول مرة تبغى تلصق في الكونسول، يطلع لك
+  تحذير ويمنعك، فاكتب allow pasting واضغط Enter · الصق هذا السطر:
+  `JSON.parse(localStorage.getItem("profile")).auth.key` (control: انسخ السطر) · انسخ المفتاح اللي طلع
+  والصقه في الحقل. It closes with the rule a page that teaches console pasting owes its reader: ولا
+  تلصق في الكونسول أي سطر يجيك من موقع ثاني, plus the failure mode of the snippet itself, which
+  throws when there is no signed-in profile to read: ولو طلع لك خطأ، تأكد إنك مسجّل دخول في
+  web.stremio.com من نفس المتصفح.
 - The way out, kept beside the way in: إذا ما ارتحت تكتب كلمة مرورك هنا، خلّ القسم هذا واشتغل بالأزرار
   اللي تحت. هذي ما ترسل شي لأي جهة، وما تبي حساب من الأصل.
 
@@ -524,6 +533,22 @@ account-free route is one scroll below and complete on its own, and the line abo
 what is sent and where. What does not: had the form been an auth key only, the page would ask for no
 password at all and this argument would disappear. That trade is the owner's, and it is written here
 so a later reader can see it was weighed rather than missed.
+
+The auth-key door is the other half of the sign-in path, and it is the only door a Facebook or Google
+account has. Its instruction is verified rather than copied from somewhere. The page tells a reader to
+run `JSON.parse(localStorage.getItem("profile")).auth.key` against their own signed-in
+`web.stremio.com` session. The key name was checked against the client's own stored data, where the
+`profile` record sits beside `installation_id` and `schema_version`, each carrying the same Chromium
+suffix inside the LevelDB key, which proves the suffix is not part of the JavaScript key, so the
+snippet reads `profile` and not some versioned variant of it. The value it reaches holds `auth.key`, a
+44-character session token, and that token is the same one `api.strem.io` accepts, measured earlier in
+this project. The field it fills is the same one the password path fills, and either value is passed
+straight into `addonCollectionSet`.
+
+Teaching a reader to paste into a browser console is a real cost, so the page pays it openly: it says
+to do this step on a computer because phones have no console, it explains the first-paste block that
+Chrome and Edge put up rather than leaving a reader stuck at `allow pasting`, and it ends with the one
+rule that matters, never paste a line that did not come from this page.
 
 The contract is taken from Stremio's own client, `stremio-api-client`, not from a wiki:
 

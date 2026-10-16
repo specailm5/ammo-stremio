@@ -673,6 +673,35 @@ function main() {
         runButton.disabled = false;
       }
     });
+
+    /*
+      The snippet is read back out of the page instead of being repeated here, so the copy
+      button can never hand out a different line than the one on screen.
+    */
+    const keySnippet = document.querySelector(".bulk-alt .snippet");
+    const copyKeyButton = document.querySelector("[data-copy-key]");
+    if (keySnippet && copyKeyButton) {
+      copyKeyButton.addEventListener("click", async () => {
+        if (await copyText(keySnippet.textContent.trim())) {
+          const original = copyKeyButton.textContent;
+          copyKeyButton.textContent = "نسخناه";
+          setTimeout(() => {
+            copyKeyButton.textContent = original;
+          }, 1600);
+          return;
+        }
+        /* No clipboard access here, so leave the line selected for a manual copy. */
+        try {
+          const range = document.createRange();
+          range.selectNodeContents(keySnippet);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } catch (error) {
+          /* Nothing left to offer, and the line stays readable either way. */
+        }
+      });
+    }
   }
 
   function applyTheme(mode) {

@@ -502,6 +502,25 @@ ol.mini li + li {
   margin-block-start: var(--s4);
 }
 
+.bulk-alt ol.mini {
+  margin-block-start: var(--s4);
+}
+
+/*
+  The one line a reader pastes into the browser console. It is deliberately selectable
+  and copyable, because retyping it by hand on a phone is where this path fails.
+*/
+.bulk-alt .snippet {
+  display: block;
+  margin-block: var(--s2);
+  padding: var(--s3);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
 .bulk-actions {
   margin-block-start: var(--s5);
 }

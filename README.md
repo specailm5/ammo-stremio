@@ -59,8 +59,13 @@ Two rules hold, and they are the reason the form can be offered at all:
 - **The collection is merged, never replaced.** An addon already present, by id or by url, is left
   exactly as its owner configured it, so the form cannot remove or overwrite anything.
 
-An account created through Facebook or Google has no password, so the form takes an auth key
-instead. That path is verified in `docs/PLAN-C.md` section 6.
+An account created through Facebook or Google has no password, so the form also takes an auth key, and
+the page spells out how to get one: sign in at `web.stremio.com`, open the browser console with `F12`,
+get past Chrome and Edge's first-paste block by typing `allow pasting`, then run
+`JSON.parse(localStorage.getItem("profile")).auth.key` and copy what it prints. The key name and the
+path through the stored profile were checked against the client's own data, and the page warns against
+pasting a snippet that did not come from it. The shipped wording is in `docs/PLAN-C.md` section 7, and
+the verification is in section 16.
 
 ## Regenerating assets
 
