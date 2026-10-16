@@ -286,7 +286,11 @@ written from, so the two can be compared after any future edit.
 - Hint: اكتب إيميلك وكلمة المرور، وبعدها اضغط الزر.
 - The password-free door, kept for Facebook and Google accounts and useful to anyone who would rather
   not type a password. Those accounts have no other way in, so it is a full procedure and not a hint.
-  Summary: بغيت تدخل بمفتاح بدل كلمة المرور؟ The five steps in order: افتح web.stremio.com وسجّل دخولك
+  The summary names the reader's own situation rather than the mechanism, because مفتاح and كلمة مرور
+  are the page's words and not the reader's: مسوّي حسابك بفيسبوك أو قوقل؟ Its opening line answers the
+  question the summary asks and then covers the second reader: يعني ما لك كلمة مرور في ستريميو، فدخولك
+  يصير بمفتاح. خُذ المفتاح بالطريقة هذي، ولو عندك كلمة مرور وتبغى تدخل بمفتاح بدالها فهي تنفعك برضه.
+  وسوّها على لابتوب أو كمبيوتر، لأن الجوال ما يفتح كونسول. The five steps in order: افتح web.stremio.com وسجّل دخولك
   بحسابك · افتح كونسول المتصفح: اضغط F12، أو Ctrl+Shift+J · أول مرة تبغى تلصق في الكونسول، يطلع لك
   تحذير ويمنعك، فاكتب allow pasting واضغط Enter · الصق هذا السطر:
   `JSON.parse(localStorage.getItem("profile")).auth.key` (control: انسخ السطر) · انسخ المفتاح اللي طلع
