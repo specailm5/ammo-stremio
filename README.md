@@ -64,8 +64,10 @@ the page spells out how to get one: sign in at `web.stremio.com`, open the brows
 get past Chrome and Edge's first-paste block by typing `allow pasting`, then run
 `JSON.parse(localStorage.getItem("profile")).auth.key` and copy what it prints. The key name and the
 path through the stored profile were checked against the client's own data, and the page warns against
-pasting a snippet that did not come from it. The shipped wording is in `docs/PLAN-C.md` section 7, and
-the verification is in section 16.
+pasting a snippet that did not come from it. The console returns the key wrapped in quotes, so the
+field strips surrounding quotes and whitespace before the value is used, and it answers the literal
+`undefined` with the reason it appears rather than sending it as a key. The shipped wording is in
+`docs/PLAN-C.md` section 7, and the verification is in section 16.
 
 ## Regenerating assets
 

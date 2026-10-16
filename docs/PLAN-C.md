@@ -290,10 +290,16 @@ written from, so the two can be compared after any future edit.
   بحسابك · افتح كونسول المتصفح: اضغط F12، أو Ctrl+Shift+J · أول مرة تبغى تلصق في الكونسول، يطلع لك
   تحذير ويمنعك، فاكتب allow pasting واضغط Enter · الصق هذا السطر:
   `JSON.parse(localStorage.getItem("profile")).auth.key` (control: انسخ السطر) · انسخ المفتاح اللي طلع
-  والصقه في الحقل. It closes with the rule a page that teaches console pasting owes its reader: ولا
-  تلصق في الكونسول أي سطر يجيك من موقع ثاني, plus the failure mode of the snippet itself, which
-  throws when there is no signed-in profile to read: ولو طلع لك خطأ، تأكد إنك مسجّل دخول في
-  web.stremio.com من نفس المتصفح.
+  والصقه في الحقل، ولو جا وعليه علامات تنصيص أو مسافات ننظفها لك. It closes with the rule a page that
+  teaches console pasting owes its reader: ولا تلصق في الكونسول أي سطر يجيك من موقع ثاني, plus the
+  failure mode of the snippet itself, which throws when there is no signed-in profile to read: ولو طلع
+  لك خطأ، تأكد إنك مسجّل دخول في web.stremio.com من نفس المتصفح.
+
+  The value is pulled apart before it is used, because a console prints a returned string inside quote
+  marks and a paste can carry spaces or a newline with it. Surrounding quotes of the straight, curly
+  and backtick kinds come off along with the whitespace, twice over, so a value that arrives double
+  wrapped still lands clean. The literal word `undefined`, which the snippet prints when the profile
+  holds no auth key yet, is answered with that reason instead of being sent as a key.
 - The way out, kept beside the way in: إذا ما ارتحت تكتب كلمة مرورك هنا، خلّ القسم هذا واشتغل بالأزرار
   اللي تحت. هذي ما ترسل شي لأي جهة، وما تبي حساب من الأصل.
 
@@ -549,6 +555,15 @@ Teaching a reader to paste into a browser console is a real cost, so the page pa
 to do this step on a computer because phones have no console, it explains the first-paste block that
 Chrome and Edge put up rather than leaving a reader stuck at `allow pasting`, and it ends with the one
 rule that matters, never paste a line that did not come from this page.
+
+The value that comes back needs handling a bare text field does not give it, and the first reader to
+try this path proved it. A console prints a returned string inside quotes, so copying the key hands
+over `'...key...'`, and a paste can bring a space, a newline or a quote from a phone keyboard's
+punctuation substitution with it. The key is therefore normalised before use: surrounding quotes of
+the straight, curly and backtick kinds are stripped along with whitespace, twice over, so a value that
+arrives double wrapped still lands clean. The literal word `undefined`, which the snippet prints when
+the profile holds no auth key yet, is answered with the reason it appears instead of being sent as a
+key, because a reader reaching that state has done the step but not the sign-in.
 
 The contract is taken from Stremio's own client, `stremio-api-client`, not from a wiki:
 

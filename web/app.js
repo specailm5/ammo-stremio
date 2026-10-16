@@ -234,6 +234,24 @@ function installLink(url) {
 }
 
 /*
+  A key copied out of a browser console arrives wrapped in the quote marks the console puts
+  around a returned string, and a paste can carry spaces on either side. Both are removed
+  here, so the reader never has to tidy the value by hand. Curly quotes are included because
+  a phone keyboard can convert straight ones on its way in.
+*/
+const KEY_QUOTES = ["'", '"', "`", "\u2018", "\u2019", "\u201c", "\u201d"];
+
+function cleanAuthKey(value) {
+  let key = String(value == null ? "" : value).trim();
+  /* Two passes, so a value wrapped twice, as a console can echo it, still comes out clean. */
+  for (let pass = 0; pass < 2; pass += 1) {
+    if (KEY_QUOTES.includes(key[0])) key = key.slice(1).trim();
+    if (KEY_QUOTES.includes(key[key.length - 1])) key = key.slice(0, -1).trim();
+  }
+  return key;
+}
+
+/*
   The bulk path is the only part of this page that sends anything anywhere. It talks to
   Stremio's own API and to nothing else. The three calls, and the descriptor shape below
   them, are taken from Stremio's own client (stremio-api-client/apiClient.js):
@@ -591,9 +609,20 @@ function main() {
     bulkForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const authKey = keyField.value.trim();
+      const authKey = cleanAuthKey(keyField.value);
       const email = emailField.value.trim();
       const password = passwordField.value;
+
+      /*
+        The snippet prints "undefined" when the profile has no auth key yet, and a reader who
+        pastes that back deserves the real reason rather than a generic rejection.
+      */
+      if (authKey === "undefined" || authKey === "null") {
+        hint.textContent =
+          "اللي لصقته مو مفتاح. تأكد إنك مسجّل دخول في web.stremio.com، وجرّب السطر مرة ثانية.";
+        hint.classList.add("is-warning");
+        return;
+      }
 
       if (!authKey && (!email || !password)) {
         hint.textContent = "يبي لها إيميلك وكلمة المرور، أو مفتاح الدخول لحاله.";
