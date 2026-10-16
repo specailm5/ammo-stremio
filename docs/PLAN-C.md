@@ -61,7 +61,7 @@ nothing, and the account-free route below it is complete on its own for a reader
    captured.
 3. **The sign-in path.** The first choice, directly under the opening: what it does, the one line that
    states what it sends and to whom, an email and a password, a collapsed auth-key door for Facebook
-   and Google accounts, and one button (§16).
+   and Apple accounts, and one button (§16).
 4. **The manual path's preamble.** Stremio installed, the TV sync fact stated conditionally, and the
    copy-each-link fallback, so a reader who will not sign in is not stranded.
 5. **The seven steps.** Each step is one card: Latin source name, what it gives you in Arabic, the
@@ -284,13 +284,15 @@ written from, so the two can be compared after any future edit.
 - Button: أضفها لحسابي
 - Labels: إيميلك في ستريميو · كلمة المرور · مفتاح الدخول
 - Hint: اكتب إيميلك وكلمة المرور، وبعدها اضغط الزر.
-- The password-free door, kept for Facebook and Google accounts and useful to anyone who would rather
+- The password-free door, kept for Facebook and Apple accounts and useful to anyone who would rather
   not type a password. Those accounts have no other way in, so it is a full procedure and not a hint.
   The summary names the reader's own situation rather than the mechanism, because مفتاح and كلمة مرور
-  are the page's words and not the reader's: مسوّي حسابك بفيسبوك أو قوقل؟ Its opening line answers the
-  question the summary asks and then covers the second reader: يعني ما لك كلمة مرور في ستريميو، فدخولك
-  يصير بمفتاح. خُذ المفتاح بالطريقة هذي، ولو عندك كلمة مرور وتبغى تدخل بمفتاح بدالها فهي تنفعك برضه.
-  وسوّها على لابتوب أو كمبيوتر، لأن الجوال ما يفتح كونسول. The five steps in order: افتح web.stremio.com وسجّل دخولك
+  are the page's words and not the reader's: مسوّي حسابك بفيسبوك ولا آبل؟ It carries a plain اضغط هنا
+  afterwards, because a reader who has never met a disclosure does not know the line opens. Its opening
+  line answers the question the summary asks and then covers the second reader: يعني ما لك كلمة مرور في
+  ستريميو، فدخولك يصير بمفتاح. خُذ المفتاح بالطريقة هذي، ولو عندك كلمة مرور وتبغى تدخل بمفتاح بدالها
+  فهي تنفعك برضه. وسوّها على لابتوب أو كمبيوتر، لأن الجوال ما يفتح كونسول. The five steps in order:
+  افتح web.stremio.com وسجّل دخولك
   بحسابك · افتح كونسول المتصفح: اضغط F12، أو Ctrl+Shift+J · أول مرة تبغى تلصق في الكونسول، يطلع لك
   تحذير ويمنعك، فاكتب allow pasting واضغط Enter · الصق هذا السطر:
   `JSON.parse(localStorage.getItem("profile")).auth.key` (control: انسخ السطر) · انسخ المفتاح اللي طلع
@@ -544,8 +546,11 @@ what is sent and where. What does not: had the form been an auth key only, the p
 password at all and this argument would disappear. That trade is the owner's, and it is written here
 so a later reader can see it was weighed rather than missed.
 
-The auth-key door is the other half of the sign-in path, and it is the only door a Facebook or Google
-account has. Its instruction is verified rather than copied from somewhere. The page tells a reader to
+The auth-key door is the other half of the sign-in path, and it is the only door a Facebook or Apple
+account has, those being the two social providers Stremio offers. That was read off the client rather
+than assumed: its Intro view builds a Facebook button and an Apple button, and no Google one, so the
+page names no provider a reader could not have used. Its instruction is verified rather than copied
+from somewhere. The page tells a reader to
 run `JSON.parse(localStorage.getItem("profile")).auth.key` against their own signed-in
 `web.stremio.com` session. The key name was checked against the client's own stored data, where the
 `profile` record sits beside `installation_id` and `schema_version`, each carrying the same Chromium

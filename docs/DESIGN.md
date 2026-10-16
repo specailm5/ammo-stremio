@@ -111,6 +111,7 @@ Computed with the skill's checker, not eyeballed (R-25):
 | `#5A5D4C` on `#FFFFFF` (muted on a card, light) | 6.76:1 |
 | `#5A5D4C` on `#EFEDE3` (muted on the token card, light) | 5.76:1 |
 | `#8A5A00` on `#EFEDE3` (accent text on the token card, light) | 5.05:1 |
+| `#8A5A00` on `#FFFFFF` (disclosure hint on a card, light) | 5.93:1 |
 
 The two decorative line values are matched to each other rather than to a threshold, because a
 separator carries no 3:1 claim: `#33372B` on `#12130F` measures 1.53:1 and `#CCC9B6` on `#F7F6F0`

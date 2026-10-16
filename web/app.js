@@ -270,14 +270,14 @@ function cleanAuthKey(value) {
 */
 function loginMessage(error) {
   const text = String((error && error.message) || error || "");
-  const key = " وإذا حسابك على فيسبوك أو قوقل، استعمل مفتاح الدخول اللي تحت.";
+  const key = " وإذا حسابك على فيسبوك أو آبل، استعمل مفتاح الدخول اللي تحت.";
   if (/user not found/i.test(text)) {
     return "ما فيه حساب في ستريميو بهالإيميل." + key;
   }
   if (/passphrase|password|incorrect|invalid/i.test(text)) {
     return "الإيميل أو كلمة المرور غلط." + key;
   }
-  if (/facebook|google|oauth|token|third/i.test(text)) {
+  if (/facebook|apple|oauth|token|third/i.test(text)) {
     return "هالحساب ما يدخل بكلمة مرور. افتح الخيار اللي تحت، والصق مفتاح الدخول.";
   }
   return `ستريميو ما قبل الدخول: ${text}`;

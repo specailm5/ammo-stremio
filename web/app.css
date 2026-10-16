@@ -493,6 +493,15 @@ ol.mini li + li {
   border-color: var(--accent);
 }
 
+/*
+  A reader who has never met a disclosure triangle does not know the line opens, so the
+  summary says so in the theme's readable accent, on one line.
+*/
+.bulk-alt summary .summary-hint {
+  color: var(--accent-readable);
+  white-space: nowrap;
+}
+
 .bulk-alt p {
   color: var(--muted);
   font-size: 0.9375rem;
