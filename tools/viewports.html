@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>عمو ستريميو: viewport harness</title>
+<style>
+  body { margin: 0; padding: 12px; background: #4a4a4a; color: #fff;
+         font: 12px/1.6 ui-monospace, Menlo, Consolas, monospace; }
+  p.lead { margin: 0 0 10px; max-width: 900px; }
+  button { font: inherit; padding: 6px 10px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  figure { margin: 0; }
+  figcaption { padding-bottom: 4px; }
+  iframe { border: 0; display: block; }
+  table { border-collapse: collapse; margin-top: 16px; }
+  th, td { border: 1px solid #777; padding: 4px 8px; text-align: left; white-space: nowrap; }
+  .ok { color: #8ee08e; }
+  .bad { color: #ff9c9c; font-weight: bold; }
+</style>
+</head>
+<body>
+<p class="lead">
+  Serves the real page in narrow frames, dark and light, and reports the checklist that matters
+  without a phone: no horizontal overflow, every control at least 44px, the token card visibly
+  different from the list, and the QR actually rendered. Serve the repository root, then open
+  /tools/viewports.html.
+</p>
+<button id="jump" type="button">Scroll frames to the token step</button>
+
+<div class="row">
+  <figure><figcaption>320, dark</figcaption><iframe data-w="320" data-theme="dark" src="/web/index.html" width="320" height="1500"></iframe></figure>
+  <figure><figcaption>360, dark</figcaption><iframe data-w="360" data-theme="dark" src="/web/index.html" width="360" height="1500"></iframe></figure>
+  <figure><figcaption>360, light</figcaption><iframe data-w="360" data-theme="light" src="/web/index.html" width="360" height="1500"></iframe></figure>
+  <figure><figcaption>390, light</figcaption><iframe data-w="390" data-theme="light" src="/web/index.html" width="390" height="1500"></iframe></figure>
+</div>
+
+<table id="report">
+  <thead>
+    <tr><th>frame</th><th>viewport</th><th>overflow</th><th>min target</th><th>h1</th>
+        <th>token card vs list</th><th>qr</th><th>steps rendered</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  var frames = [].slice.call(document.querySelectorAll("iframe"));
+  var jumped = false;
+
+  function measure(frame) {
+    var doc = frame.contentDocument;
+    var win = frame.contentWindow;
+    var de = doc.documentElement;
+    var card = doc.querySelector('[data-id="pengu"]');
+    var list = doc.querySelector(".steps");
+    var qr = doc.querySelector(".qr img");
+    var targets = [].slice.call(doc.querySelectorAll(".btn, summary, input"))
+      .map(function (node) { return Math.round(node.getBoundingClientRect().height); });
+    return {
+      viewport: de.clientWidth,
+      overflow: de.scrollWidth > de.clientWidth + 1,
+      minTarget: targets.length ? Math.min.apply(null, targets) : 0,
+      h1: getComputedStyle(doc.querySelector("h1")).fontSize,
+      cardBg: getComputedStyle(card).backgroundColor,
+      listBg: getComputedStyle(list).backgroundColor,
+      qrWidth: qr ? Math.round(qr.getBoundingClientRect().width) : 0,
+      steps: doc.querySelectorAll(".step").length,
+      theme: de.dataset.theme
+    };
+  }
+
+  function flag(good) {
+    return '<span class="' + (good ? "ok" : "bad") + '">' + (good ? "pass" : "FAIL") + "</span>";
+  }
+
+  function report() {
+    var body = document.querySelector("#report tbody");
+    body.innerHTML = "";
+    frames.forEach(function (frame) {
+      var m = measure(frame);
+      var row = document.createElement("tr");
+      row.innerHTML =
+        "<td>" + frame.dataset.w + " / " + frame.dataset.theme + "</td>" +
+        "<td>" + m.viewport + "</td>" +
+        "<td>" + (m.overflow ? '<span class="bad">FAIL</span>' : '<span class="ok">pass</span>') + "</td>" +
+        "<td>" + m.minTarget + "px</td>" +
+        "<td>" + m.h1 + "</td>" +
+        "<td>" + (m.cardBg !== m.listBg ? '<span class="ok">pass</span> ' : '<span class="bad">FAIL</span> ') + m.cardBg + "</td>" +
+        "<td>" + (m.qrWidth > 0 ? '<span class="ok">pass</span> ' : '<span class="bad">FAIL</span> ') + m.qrWidth + "px</td>" +
+        "<td>" + m.steps + "</td>";
+      body.appendChild(row);
+    });
+  }
+
+  frames.forEach(function (frame) {
+    frame.addEventListener("load", function () {
+      frame.contentDocument.documentElement.dataset.theme = frame.dataset.theme;
+      if (jumped) jump(frame);
+      report();
+    });
+  });
+
+  function jump(frame) {
+    var win = frame.contentWindow;
+    var card = frame.contentDocument.querySelector('[data-id="pengu"]');
+    win.scrollTo(0, card.getBoundingClientRect().top + win.scrollY - 70);
+  }
+
+  document.getElementById("jump").addEventListener("click", function () {
+    jumped = !jumped;
+    frames.forEach(function (frame) {
+      if (jumped) jump(frame);
+      else frame.contentWindow.scrollTo(0, 0);
+    });
+    this.textContent = jumped ? "Back to the top" : "Scroll frames to the token step";
+  });
+</script>
+</body>
+</html>

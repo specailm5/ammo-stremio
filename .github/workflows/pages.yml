@@ -1,0 +1,67 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The page claims it sends nothing anywhere. That claim is only worth making
+      # while it is enforced, so a subresource pointing off-origin fails the build.
+      - name: Refuse off-origin subresources
+        run: |
+          if grep -nE '<(script|img)[^>]+src="https?://|<link[^>]+href="https?://' web/index.html; then
+            echo "::error::An off-origin subresource would break the no-third-party-requests claim."
+            exit 1
+          fi
+          echo "No off-origin subresources in index.html."
+
+      - name: Refuse remote fonts and analytics in the shell
+        run: |
+          if grep -nEi 'fonts\.googleapis|fonts\.gstatic|googletagmanager|google-analytics|cdn\.|unpkg|jsdelivr' web/app.css web/app.js; then
+            echo "::error::A CDN or analytics reference found in the site shell."
+            exit 1
+          fi
+          echo "Site shell is self-contained."
+
+      - name: Confirm the committed assets are present
+        run: |
+          for file in web/assets/penguplay-qr.png \
+                      web/assets/fonts/plex.css \
+                      web/assets/fonts/plex-arabic-400.woff2 \
+                      web/assets/fonts/plex-arabic-700.woff2; do
+            test -s "$file" || { echo "::error::Missing or empty: $file"; exit 1; }
+          done
+          echo "Assets present."
+
+  deploy:
+    needs: guard
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: deploy
+        uses: actions/deploy-pages@v4

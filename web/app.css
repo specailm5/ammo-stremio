@@ -1,0 +1,510 @@
+/*
+  عمو ستريميو. Tokens are ported from docs/DESIGN.md section 6, and any pair not
+  listed there under "Verified pairs" has to be measured before it is used.
+
+  The single repeated gesture is the 2px line: it cuts the steps apart and doubles as
+  the progress track under the masthead, with the accent marking how far along the
+  reader is.
+*/
+
+:root {
+  --bg: #12130f;
+  --surface: #1b1d16;
+  --surface-2: #24271e;
+  --text: #f2f1e6;
+  --muted: #a8aa97;
+  --line: #33372b;
+  --line-control: #7c8170;
+  --accent: #e3a12b;
+  --accent-ink: #1a1508;
+  --accent-readable: var(--accent);
+  --field-bg: var(--bg);
+
+  --r-control: 8px;
+  --r-card: 12px;
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  --measure: 44rem;
+  --gutter: var(--s4);
+  --bar: 62px;
+
+  --font: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, sans-serif;
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #f7f6f0;
+  --surface: #ffffff;
+  --surface-2: #efede3;
+  --text: #17190f;
+  --muted: #5a5d4c;
+  --line: #ccc9b6;
+  --accent-readable: #8a5a00;
+  --field-bg: var(--bg);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.0625rem);
+  line-height: 1.8;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent-readable);
+  text-underline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-readable);
+  outline-offset: 2px;
+  border-radius: var(--s1);
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Mono", Menlo, monospace;
+  font-size: 0.95em;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Masthead and progress track ------------------------------------------- */
+
+.masthead {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background: var(--bg);
+}
+
+.masthead-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  width: min(100% - 2 * var(--gutter), var(--measure));
+  margin-inline: auto;
+  padding-block: var(--s2);
+}
+
+.wordmark {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: 0;
+}
+
+.track {
+  height: 2px;
+  background: var(--line);
+}
+
+.track-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 220ms ease;
+}
+
+/* Page ---------------------------------------------------------------- */
+
+main {
+  width: min(100% - 2 * var(--gutter), var(--measure));
+  margin-inline: auto;
+  padding-block: var(--s6) var(--s7);
+}
+
+section {
+  scroll-margin-block-start: calc(var(--bar) + var(--s5));
+}
+
+section + section {
+  margin-block-start: var(--s7);
+}
+
+.hero h1 {
+  font-size: clamp(1.5rem, 1.1rem + 3vw, 2.25rem);
+  text-wrap: balance;
+}
+
+.hero p {
+  margin-block-start: var(--s4);
+  color: var(--muted);
+  max-inline-size: 34rem;
+}
+
+.hero .btn {
+  margin-block-start: var(--s5);
+}
+
+.before {
+  margin-block-start: var(--s6);
+  padding: var(--s5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  color: var(--muted);
+}
+
+.before h2 {
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.before p {
+  margin-block-start: var(--s2);
+}
+
+.section-head {
+  font-size: 1.0625rem;
+  text-transform: none;
+}
+
+.progress {
+  margin-block-start: var(--s2);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Steps --------------------------------------------------------------- */
+
+ol.steps {
+  margin: var(--s5) 0 0;
+  padding: 0;
+  list-style: none;
+  background: var(--surface);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+
+.step {
+  padding: var(--s5);
+}
+
+.step + .step {
+  border-block-start: 2px solid var(--line);
+}
+
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.step-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border: 1px solid var(--line-control);
+  border-radius: var(--r-control);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.step.is-done .step-num {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.step-name {
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.step-gives {
+  margin-block-start: var(--s3);
+  color: var(--muted);
+}
+
+.step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  margin-block-start: var(--s5);
+}
+
+/* The token step breaks the rhythm on purpose: it is the only card that asks
+   the reader for anything. */
+.step.is-token {
+  background: var(--surface-2);
+}
+
+.step-fallback:not(:empty) {
+  margin-block-start: var(--s4);
+}
+
+.pending {
+  color: var(--muted);
+}
+
+.copy-target {
+  inline-size: 100%;
+  margin-block-start: var(--s3);
+  padding: var(--s3);
+  background: var(--field-bg);
+  border: 1px solid var(--line-control);
+  border-radius: var(--r-control);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+/* Controls ------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 44px;
+  padding-inline: var(--s5);
+  border-radius: var(--r-control);
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn-quiet {
+  border-color: var(--line-control);
+}
+
+.btn-mark {
+  border-color: var(--line-control);
+  color: var(--muted);
+  margin-inline-start: auto;
+}
+
+.btn-mark[aria-pressed="true"] {
+  border-color: var(--accent-readable);
+  color: var(--accent-readable);
+}
+
+.btn.is-disabled,
+.btn:disabled {
+  border-color: var(--line-control);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.btn-primary.is-disabled {
+  background: transparent;
+  color: var(--muted);
+}
+
+/* Token step ---------------------------------------------------------- */
+
+.token-intro {
+  margin-block-start: var(--s4);
+}
+
+ol.mini {
+  margin: var(--s4) 0 0;
+  padding-inline-start: var(--s5);
+  color: var(--muted);
+}
+
+ol.mini li + li {
+  margin-block-start: var(--s2);
+}
+
+.qr {
+  margin: var(--s5) 0 0;
+  inline-size: fit-content;
+}
+
+.qr img {
+  display: block;
+  inline-size: 222px;
+  block-size: auto;
+  background: #f7f6f0;
+  padding: var(--s4);
+  border-radius: var(--r-card);
+}
+
+.qr figcaption {
+  margin-block-start: var(--s3);
+  color: var(--muted);
+  max-inline-size: 26rem;
+}
+
+.field {
+  margin-block-start: var(--s5);
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+}
+
+.field input {
+  inline-size: 100%;
+  margin-block-start: var(--s2);
+  padding: var(--s3) var(--s4);
+  background: var(--field-bg);
+  border: 1px solid var(--line-control);
+  border-radius: var(--r-control);
+  color: var(--text);
+  font: inherit;
+}
+
+.field input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.hint {
+  margin-block-start: var(--s2);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.hint.is-warning {
+  color: var(--text);
+}
+
+.privacy,
+.fallback-line {
+  margin-block-start: var(--s4);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+/* Recovery and FAQ ---------------------------------------------------- */
+
+.recovery p + p {
+  margin-block-start: var(--s3);
+}
+
+.recovery,
+.faq {
+  color: var(--muted);
+}
+
+.faq details {
+  border-block-start: 2px solid var(--line);
+}
+
+.faq details:last-child {
+  border-block-end: 2px solid var(--line);
+}
+
+.faq summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding-block: var(--s4);
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.faq summary::before {
+  content: "";
+  flex: none;
+  inline-size: 10px;
+  block-size: 10px;
+  border: 2px solid var(--line-control);
+  border-radius: 2px;
+}
+
+.faq details[open] summary::before {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq .answer {
+  padding-block-end: var(--s4);
+}
+
+footer {
+  margin-block-start: var(--s7);
+  padding-block-start: var(--s5);
+  border-block-start: 2px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .track-fill {
+    transition: none;
+  }
+}
+
+@media (max-width: 30rem) {
+  :root {
+    --gutter: var(--s3);
+    --s5: 16px;
+    --s7: 32px;
+  }
+
+  .step-actions .btn {
+    inline-size: 100%;
+  }
+
+  .btn-mark {
+    margin-inline-start: 0;
+  }
+}

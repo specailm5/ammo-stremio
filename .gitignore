@@ -1,0 +1,12 @@
+# Build inputs for the font subsets. The shipped woff2 files are committed.
+web/assets/fonts/.source/
+
+# Chromium user-data leftovers from the local viewport harness
+tools/.profile/
+
+# Editor and OS noise
+.vscode/
+.idea/
+*.log
+Thumbs.db
+desktop.ini

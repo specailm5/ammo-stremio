@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>عمو ستريميو · إضافات ستريميو جاهزة بضغطة واحدة</title>
+<meta name="description" content="سبع إضافات لستريميو بإعدادات مختارة سلفاً: أفلام ومسلسلات وأنمي وترجمة عربية. تُضاف بضغطة واحدة، بلا حساب وبلا خادم.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#12130F">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2312130F'/%3E%3Crect x='7' y='15' width='18' height='2' fill='%23E3A12B'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/plex-arabic-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fonts/plex.css">
+<link rel="stylesheet" href="app.css">
+<script>
+/* Applied before first paint so a reader who chose the light theme never sees a dark flash. */
+try {
+  if (JSON.parse(localStorage.getItem("ammo.theme")) === "light") {
+    document.documentElement.dataset.theme = "light";
+  }
+} catch (error) {}
+</script>
+<script src="app.js" defer></script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <span class="wordmark">عمو ستريميو</span>
+    <button class="btn btn-quiet" id="theme" type="button" aria-pressed="false">الوضع النهاري</button>
+  </div>
+  <div class="track" role="presentation">
+    <span class="track-fill" id="track-fill"></span>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <h1>إضافات ستريميو، جاهزة بضغطة واحدة</h1>
+    <p>
+      سبع إضافات تفتح لك الأفلام والمسلسلات والأنمي والترجمة العربية في ستريميو. اخترنا الإعدادات
+      نيابةً عنك، فلا تضبط شيئاً بيدك.
+    </p>
+    <button class="btn btn-primary" id="start" type="button">ابدأ الإضافة</button>
+  </section>
+
+  <section class="before">
+    <h2>قبل أن تبدأ</h2>
+    <p>
+      افتح هذه الصفحة على جوالك. وإن سجّلت الدخول في ستريميو بالحساب نفسه على التلفاز، وصلت
+      الإضافات إليه بلا عمل إضافي. وإن كنت تشاهد من غير حساب، فانسخ روابط الإضافات أدناه
+      وألصقها على التلفاز واحدة واحدة.
+    </p>
+  </section>
+
+  <section>
+    <h2 class="section-head" id="steps-heading" tabindex="-1">الإضافات السبع</h2>
+    <p class="progress" id="progress" aria-live="polite">لم تضف شيئاً بعد.</p>
+    <ol class="steps" id="steps"></ol>
+    <noscript>
+      <p>
+        الصفحة تبني روابط الإضافة في متصفحك، فتحتاج إلى جافاسكربت. ويمكنك في كل حال لصق هذه
+        الروابط في خانة «رابط مستودع الإضافات» داخل ستريميو:
+      </p>
+      <p dir="ltr">
+        https://7a82163c306e-stremio-netflix-catalog-addon.baby-beamup.club/manifest.json<br>
+        https://anime-kitsu.strem.fun/manifest.json
+      </p>
+      <p>أما <bdi dir="ltr">PenguPlay</bdi> فيحتاج رمزاً، ولا يعمل من دون جافاسكربت.</p>
+    </noscript>
+  </section>
+
+  <section class="recovery">
+    <h2 class="section-head">إن اختفى صف أو فرغت إضافة</h2>
+    <p>
+      يحصل هذا حين يغيّر المصدر عنوانه أو إعداداته. افتح هذه الصفحة، وأعد إضافة الصف الذي اختلّ
+      وحده. وفي ستريميو لا تكفي إزالة الإضافة ثم إضافتها، لأنه لا يقرأ الإعدادات من جديد؛ الصق
+      الرابط في خانة «رابط مستودع الإضافات» ليُعاد تحميله.
+    </p>
+    <p>هذه صفحة ثابتة، لا تصل إلى إضافاتك من بعيد. الإصلاح بيدك، وخطواته أعلاه.</p>
+  </section>
+
+  <section class="faq">
+    <h2 class="section-head">أسئلة يتكرر سؤالها</h2>
+
+    <details>
+      <summary>هل تحتاج إلى حساب ستريميو وكلمة مروره؟</summary>
+      <p class="answer">لا. لا نطلب كلمة مرورك ولا نحتاجها. تُضاف الإضافات من جهازك مباشرة.</p>
+    </details>
+
+    <details>
+      <summary>لماذا سبع إضافات ولا إضافة واحدة تجمعهنّ؟</summary>
+      <p class="answer">
+        لأن الجمع يحتاج خادماً يعمل على مدار الساعة. اخترنا ألا نقف بينك وبين المصادر، فبقيت سبعاً،
+        ولا نحتاج خادماً ولا مالاً.
+      </p>
+    </details>
+
+    <details>
+      <summary>هل يعمل على التلفاز؟</summary>
+      <p class="answer">
+        نعم. وإن سجّلت الدخول بالحساب نفسه في الجوال والتلفاز، أضفت الإضافات مرة واحدة على الجوال
+        فوصلت إليه. وإن لم تسجّل، نسختَ كل رابط وألصقته على التلفاز.
+      </p>
+    </details>
+
+    <details>
+      <summary>ما مصير الرمز الذي ألصقه؟</summary>
+      <p class="answer">يدخل في الرابط الذي تضيفه إلى ستريميو، ويبقى في جهازك.</p>
+    </details>
+  </section>
+
+  <footer>
+    <p>عمو ستريميو. لا حساب، ولا خادم، ولا نرسل شيئاً: كل ما في هذه الصفحة يعمل في متصفحك.</p>
+  </footer>
+
+</main>
+
+</body>
+</html>
