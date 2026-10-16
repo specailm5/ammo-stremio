@@ -1,9 +1,13 @@
 # عمو ستريميو
 
 A one-page Arabic installer for seven Stremio addons, with the settings already chosen, so a
-non-technical reader clicks one button per addon and configures nothing. Static files on GitHub
-Pages: no server, no database, no recurring cost. Every install runs in the browser, and the one
-optional shortcut talks to Stremio's own API and to nothing else.
+non-technical reader configures nothing. Static files on GitHub Pages: no server, no database, no
+recurring cost. The page leads with a sign-in path that writes every addon in one request, and falls
+back to one button per addon for a reader who will not sign in. The only thing either path talks to is
+Stremio's own API.
+
+The copy ships in the **Saudi dialect**, on the owner's instruction. `docs/PLAN-C.md` section 7 holds
+the deck it was written from, and section 12 the reason and what the choice costs.
 
 Plans live in `docs/` and are **not** published. Only `web/` is deployed.
 
@@ -12,7 +16,7 @@ Plans live in `docs/` and are **not** published. Only `web/` is deployed.
 ```
 web/index.html                 the page
 web/app.css                    tokens and layout, mobile first, RTL with logical properties
-web/app.js                     UPSTREAMS table, config encoder, progress, token flow
+web/app.js                     UPSTREAMS table, config encoders, sign-in path, progress, token flow
 web/assets/penguplay-qr.png    generated, never hand-saved
 web/assets/fonts/plex.css      generated @font-face sheet
 web/assets/fonts/*.woff2       generated IBM Plex Sans Arabic subsets
@@ -32,11 +36,11 @@ config is accepted only once a manifest fetch proves it. The encoders differ per
 no single recipe: of the four captured in the last pass, one is plain `btoa`, one is url-safe base64
 with the padding stripped, one is standard base64, and one needs no config at all.
 
-## The bulk shortcut
+## The sign-in path
 
-The page offers a second, optional path. A reader signs in to Stremio and all the addons are written
-to the account in one request, instead of seven clicks. It is built on Stremio's own API and on
-nothing else:
+This is the path the page leads with. A reader signs in to Stremio and all the addons are written to
+the account in one request, instead of seven clicks. It is built on Stremio's own API and on nothing
+else:
 
 | call | body | returns |
 |---|---|---|
@@ -47,13 +51,13 @@ nothing else:
 Those shapes come from Stremio's own client (`stremio-api-client`), and one entry is
 `{transportUrl, manifest, flags}`, which is what a real signed-in profile holds on disk.
 
-Two rules hold, and they are the reason the shortcut can be offered at all:
+Two rules hold, and they are the reason the form can be offered at all:
 
 - **Nothing is stored.** The password and the auth key live in one argument object for the length of
   one request. They are never written to storage, never put in a URL, and the fields are cleared
   whether the attempt works or not.
 - **The collection is merged, never replaced.** An addon already present, by id or by url, is left
-  exactly as its owner configured it, so the shortcut cannot remove or overwrite anything.
+  exactly as its owner configured it, so the form cannot remove or overwrite anything.
 
 An account created through Facebook or Google has no password, so the form takes an auth key
 instead. That path is verified in `docs/PLAN-C.md` section 6.

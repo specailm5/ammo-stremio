@@ -82,7 +82,7 @@ const UPSTREAMS = [
     gives:
       "صفوف <bdi dir=\"ltr\">Netflix</bdi> و <bdi dir=\"ltr\">Disney+</bdi> و " +
       "<bdi dir=\"ltr\">Prime</bdi> و <bdi dir=\"ltr\">Apple TV+</bdi> و " +
-      "<bdi dir=\"ltr\">HBO Max</bdi>، أفلاماً ومسلسلات.",
+      "<bdi dir=\"ltr\">HBO Max</bdi>، أفلام ومسلسلات.",
     proof: "10 boards, fetched 2026-10-16",
     ready: true,
     url: () => `${CATALOGS}/manifest.json`,
@@ -90,7 +90,7 @@ const UPSTREAMS = [
   {
     id: "dramayo",
     name: "Dramayo",
-    gives: "مسلسلات آسيوية مترجمة: كورية وصينية ويابانية وتايلاندية.",
+    gives: "مسلسلات آسيوية مترجمة: كوري وصيني وياباني وتايلندي.",
     proof: "16 boards; asking for 2 of them returned 4, so the field is honoured, 2026-10-16",
     ready: true,
     url: () => `${DRAMAYO}/${encodeConfig(dramayoConfig())}/manifest.json`,
@@ -98,7 +98,7 @@ const UPSTREAMS = [
   {
     id: "hdhub",
     name: "HdHub",
-    gives: "مصادر مشاهدة للأفلام والمسلسلات.",
+    gives: "مصادر تشاهد منها الأفلام والمسلسلات.",
     proof: "4 boards; qualities=2160p returned 4KHDHub 4K and qualities=480p returned HdHub 480p, 2026-10-16",
     ready: true,
     url: () => `${HDHUB}/${encodeConfig(hdhubConfig())}/manifest.json`,
@@ -107,8 +107,8 @@ const UPSTREAMS = [
     id: "flix",
     name: "Flix-Streams",
     gives:
-      "مصادر مشاهدة إضافية، وفيها صفوف قنوات مباشرة. بعض ملفاتها تتكرر مع الخطوة الثالثة، " +
-      "فالملف نفسه قد يظهر مرتين.",
+      "مصادر زيادة، وفيها صفوف قنوات مباشرة. بعض ملفاتها تتكرر مع الخطوة الثالثة، " +
+      "يعني نفس الملف يمكن يجيك مرتين.",
     proof: "the bare url returns the same 8 streams and 40 live events as the publisher's own default blob, 2026-10-16",
     ready: true,
     url: () => `${FLIX}/manifest.json`,
@@ -132,7 +132,7 @@ const UPSTREAMS = [
   {
     id: "pengu",
     name: "PenguPlay",
-    gives: "مصادر مشاهدة سريعة، وتحتاج رمزاً خاصاً بك.",
+    gives: "مصادر سريعة، وتبي لها رمز خاص لك.",
     proof: "token required, source list inferred from the configure form",
     ready: true,
     token: true,
@@ -252,25 +252,25 @@ function installLink(url) {
 */
 function loginMessage(error) {
   const text = String((error && error.message) || error || "");
-  const key = " وإن كان حسابك عبر فيسبوك أو جوجل، فاستعمل مفتاح الدخول في الأسفل.";
+  const key = " وإذا حسابك على فيسبوك أو قوقل، استعمل مفتاح الدخول اللي تحت.";
   if (/user not found/i.test(text)) {
-    return "لا يوجد حساب في ستريميو بهذا البريد." + key;
+    return "ما فيه حساب في ستريميو بهالإيميل." + key;
   }
   if (/passphrase|password|incorrect|invalid/i.test(text)) {
-    return "البريد أو كلمة المرور غير صحيحة." + key;
+    return "الإيميل أو كلمة المرور غلط." + key;
   }
   if (/facebook|google|oauth|token|third/i.test(text)) {
-    return "هذا الحساب لا يدخل بكلمة مرور. افتح الخيار في الأسفل، والصق مفتاح الدخول.";
+    return "هالحساب ما يدخل بكلمة مرور. افتح الخيار اللي تحت، والصق مفتاح الدخول.";
   }
-  return `لم يقبل ستريميو الدخول: ${text}`;
+  return `ستريميو ما قبل الدخول: ${text}`;
 }
 
 function sessionMessage(error) {
   const text = String((error && error.message) || error || "");
   if (/session does not exist|expired|invalid/i.test(text)) {
-    return "مفتاح الدخول غير صحيح، أو انتهت صلاحيته. انسخه من جديد.";
+    return "مفتاح الدخول غلط، أو انتهت صلاحيته. انسخه من جديد.";
   }
-  return `لم نقرأ إضافاتك: ${text}`;
+  return `ما قدرنا نقرا إضافاتك: ${text}`;
 }
 
 async function stremio(method, params, requireResult = true) {
@@ -282,24 +282,24 @@ async function stremio(method, params, requireResult = true) {
       body: JSON.stringify(params),
     });
   } catch (error) {
-    throw new Error("تعذّر الوصول إلى ستريميو. تأكّد من اتصالك ثم أعد المحاولة.");
+    throw new Error("ما قدرنا نوصل لستريميو. شيّك على اتصالك وجرّب مرة ثانية.");
   }
-  if (!response.ok) throw new Error(`ردّ ستريميو بخطأ ${response.status}.`);
+  if (!response.ok) throw new Error(`ستريميو رد بخطأ ${response.status}.`);
   let body;
   try {
     body = await response.json();
   } catch (error) {
-    throw new Error("لم نفهم ردّ ستريميو.");
+    throw new Error("ما فهمنا رد ستريميو.");
   }
-  if (body.error) throw new Error(body.error.message || "رفض ستريميو الطلب.");
-  if (requireResult && !body.result) throw new Error("لم يصل ردّ من ستريميو.");
+  if (body.error) throw new Error(body.error.message || "ستريميو رفض الطلب.");
+  if (requireResult && !body.result) throw new Error("ما وصل رد من ستريميو.");
   return body.result;
 }
 
 async function bulkAdd({ steps, credentials, onStatus }) {
   let authKey = (credentials.authKey || "").trim();
   if (!authKey) {
-    onStatus("نتحقق من حسابك في ستريميو…");
+    onStatus("نتأكد من حسابك في ستريميو…");
     let login;
     try {
       login = await stremio("login", {
@@ -310,12 +310,12 @@ async function bulkAdd({ steps, credentials, onStatus }) {
       throw new Error(loginMessage(error));
     }
     if (!login || !login.authKey) {
-      throw new Error("لم يرسل ستريميو مفتاح الدخول. تأكّد من البريد وكلمة المرور.");
+      throw new Error("ستريميو ما أرسل مفتاح الدخول. تأكد من الإيميل وكلمة المرور.");
     }
     authKey = login.authKey;
   }
 
-  onStatus("نقرأ إضافاتك الحالية…");
+  onStatus("نقرا إضافاتك الحالية…");
   let collection;
   try {
     collection = await stremio("addonCollectionGet", {
@@ -340,18 +340,18 @@ async function bulkAdd({ steps, credentials, onStatus }) {
       skipped.push({ name: step.name, why: "موجودة عندك" });
       continue;
     }
-    onStatus(`نقرأ إعدادات ${step.name} (${index + 1} من ${steps.length})…`);
+    onStatus(`نقرا إعدادات ${step.name} (${index + 1} من ${steps.length})…`);
     let manifest;
     try {
       const response = await fetch(step.url);
       if (!response.ok) throw new Error(String(response.status));
       manifest = await response.json();
     } catch (error) {
-      failed.push({ name: step.name, why: "تعذّر قراءة إعداداتها" });
+      failed.push({ name: step.name, why: "ما قدرنا نقرا إعداداتها" });
       continue;
     }
     if (!manifest || !manifest.id) {
-      failed.push({ name: step.name, why: "ردّها غير مفهوم" });
+      failed.push({ name: step.name, why: "ردها غير مفهوم" });
       continue;
     }
     if (haveIds.has(manifest.id)) {
@@ -388,7 +388,7 @@ function stepMarkup(step, number) {
     <p class="step-gives">${step.gives}</p>
     ${step.token ? tokenMarkup() : ""}
     <div class="step-actions">
-      <a class="btn btn-primary" data-install>أضِف إلى ستريميو</a>
+      <a class="btn btn-primary" data-install>أضفها لستريميو</a>
       <button class="btn btn-quiet" type="button" data-copy>انسخ الرابط</button>
       <button class="btn btn-mark" type="button" aria-pressed="false" data-mark>أضفتها</button>
     </div>
@@ -398,33 +398,32 @@ function stepMarkup(step, number) {
 function tokenMarkup() {
   return `
     <p class="token-intro">
-      هذه الإضافة وحدها تطلب رمزاً. تصدره لك قناة <bdi dir="ltr">PenguPlay</bdi> على تيليجرام،
-      ولا يكلّفك شيئاً.
+      هذي الإضافة لحالها تبي لها رمز، وتعطيك إياه قناة <bdi dir="ltr">PenguPlay</bdi> على
+      تيليجرام، وببلاش.
     </p>
     <ol class="mini">
       <li>افتح محادثة البوت في تيليجرام: <a href="${BOT_URL}" rel="noopener">افتح البوت</a></li>
-      <li>أرسل إليه الأمر <code dir="ltr">/token</code></li>
-      <li>سيردّ عليك برمز. انسخه.</li>
-      <li>الصقه في الحقل أدناه، ثم اضغط زرّ الإضافة.</li>
+      <li>أرسل له الأمر <code dir="ltr">/token</code></li>
+      <li>بيجيك رمز. انسخه.</li>
+      <li>الصقه في الحقل اللي تحت، وبعدها اضغط زر الإضافة.</li>
     </ol>
     <figure class="qr">
       <img src="assets/penguplay-qr.png" width="444" height="444" decoding="async"
-           alt="رمز QR يفتح محادثة PenguPlayBot على تيليجرام">
+           alt="رمز QR يفتح محادثة PenguPlayBot في تيليجرام">
       <figcaption>
-        أو امسح هذا الرمز بكاميرا جوالك. المسح ينفع حين تكون هذه الصفحة أمامك على التلفاز أو
-        الحاسوب.
+        أو امسح هالرمز بكاميرا جوالك. المسح يفيدك لما تكون الصفحة قدامك على التلفاز أو اللابتوب.
       </figcaption>
     </figure>
     <div class="field">
       <label for="token">الرمز</label>
       <input id="token" type="text" autocomplete="off" autocapitalize="off" autocorrect="off"
              spellcheck="false" placeholder="الصق الرمز هنا">
-      <p class="hint" data-hint>لم تلصق رمزاً بعد.</p>
+      <p class="hint" data-hint>ما لصقت رمز للحين.</p>
     </div>
-    <p class="privacy">يبني متصفحك الرابط هنا، ولا يرسل الرمز إلى أي جهة.</p>
+    <p class="privacy">متصفحك يبني الرابط هنا، وما يرسل الرمز لأي جهة.</p>
     <p class="fallback-line">
-      إن لم يستجب البوت، فانضم إلى سيرفر <bdi dir="ltr">PenguPlay</bdi> على ديسكورد، واكتب
-      الأمر نفسه فيه: <a href="${DISCORD_URL}" rel="noopener">سيرفر ديسكورد</a>
+      إذا البوت ما رد، ادخل سيرفر <bdi dir="ltr">PenguPlay</bdi> على ديسكورد، واكتب
+      نفس الأمر هناك: <a href="${DISCORD_URL}" rel="noopener">سيرفر ديسكورد</a>
     </p>`;
 }
 
@@ -442,7 +441,7 @@ function buildStep(step, index) {
   }
   if (!step.ready) {
     card.querySelector(".step-fallback").innerHTML =
-      `<p class="pending">لم نجهّز إعدادات هذه الإضافة بعد.</p>`;
+      `<p class="pending">ما جهّزنا إعدادات هذي الإضافة للحين.</p>`;
   }
   return card;
 }
@@ -467,7 +466,7 @@ function main() {
 
   function render() {
     track.style.width = `${(done.size / total) * 100}%`;
-    progress.textContent = done.size === 0 ? "لم تضف شيئاً بعد." : `أضفت ${done.size} من ${total}.`;
+    progress.textContent = done.size === 0 ? "ما أضفت شي للحين." : `أضفت ${done.size} من ${total}.`;
 
     for (const card of list.children) {
       const step = UPSTREAMS.find((item) => item.id === card.dataset.id);
@@ -478,7 +477,7 @@ function main() {
 
       card.classList.toggle("is-done", marked);
       mark.setAttribute("aria-pressed", String(marked));
-      mark.textContent = marked ? "تمت الإضافة" : "أضفتها";
+      mark.textContent = marked ? "خلصت" : "أضفتها";
 
       if (url) {
         install.setAttribute("href", installLink(url));
@@ -497,13 +496,13 @@ function main() {
     const field = card.querySelector("#token");
     const trimmed = token.trim();
     if (!trimmed) {
-      hint.textContent = "لم تلصق رمزاً بعد، والزر يتفعّل بعد اللصق.";
+      hint.textContent = "ما لصقت رمز للحين، والزر يشتغل بعد اللصق.";
       hint.classList.remove("is-warning");
     } else if (trimmed.length < 20) {
-      hint.textContent = "الرمز أقصر من المعتاد، فتأكد أنك نسخته كاملاً.";
+      hint.textContent = "الرمز أقصر من العادة، تأكد إنك نسخته كامل.";
       hint.classList.add("is-warning");
     } else {
-      hint.textContent = "يطول الرمز عادةً، فتأكد أنك نسخته كاملاً.";
+      hint.textContent = "الرمز يطول عادة، تأكد إنك نسخته كامل.";
       hint.classList.remove("is-warning");
     }
     if (field.value !== token) field.value = token;
@@ -527,7 +526,7 @@ function main() {
     const card = button.closest(".step");
     if (await copyText(url)) {
       const original = button.textContent;
-      button.textContent = "نُسخ";
+      button.textContent = "نسخناه";
       setTimeout(() => {
         button.textContent = original;
       }, 1600);
@@ -597,7 +596,7 @@ function main() {
       const password = passwordField.value;
 
       if (!authKey && (!email || !password)) {
-        hint.textContent = "نحتاج بريدك وكلمة مرورك، أو مفتاح الدخول وحده.";
+        hint.textContent = "يبي لها إيميلك وكلمة المرور، أو مفتاح الدخول لحاله.";
         hint.classList.add("is-warning");
         return;
       }
@@ -635,18 +634,18 @@ function main() {
 
         const lines = [];
         if (outcome.added.length) {
-          lines.push(`أُضيفت: ${outcome.added.map((item) => item.name).join("، ")}.`);
+          lines.push(`أضفنا: ${outcome.added.map((item) => item.name).join("، ")}.`);
         }
         if (outcome.skipped.length) {
           lines.push(
-            `تركناها كما هي: ${outcome.skipped
+            `خلّيناها مثل ما هي: ${outcome.skipped
               .map((item) => `${item.name} (${item.why})`)
               .join("، ")}.`,
           );
         }
         if (outcome.failed.length) {
           lines.push(
-            `تعذّرت: ${outcome.failed
+            `ما ضبطت: ${outcome.failed
               .map((item) => `${item.name} (${item.why})`)
               .join("، ")}.`,
           );
@@ -659,13 +658,13 @@ function main() {
         result.hidden = lines.length === 0;
 
         if (outcome.added.length) {
-          status.textContent = "تمّ. افتح ستريميو، وستجدها في «إضافاتي».";
+          status.textContent = "تم. افتح ستريميو وتلقاها في «إضافاتي».";
         } else if (outcome.failed.length) {
-          status.textContent = "لم تكتمل. أعد المحاولة بعد قليل.";
+          status.textContent = "ما كملت. جرّب بعد شوي.";
         } else if (outcome.skipped.length) {
-          status.textContent = "كلها عندك، فلم نغيّر شيئاً.";
+          status.textContent = "كلها عندك، وما غيّرنا شي.";
         } else {
-          status.textContent = "لم نجد ما نضيفه.";
+          status.textContent = "ما لقينا شي نضيفه.";
         }
       } catch (error) {
         passwordField.value = "";
@@ -691,8 +690,9 @@ function main() {
     applyTheme(next);
   });
 
+  /* Sign-in is the first choice now, so the one button on the hero lands there. */
   document.getElementById("start").addEventListener("click", () => {
-    const heading = document.getElementById("steps-heading");
+    const heading = document.getElementById("bulk-heading");
     heading.scrollIntoView({ block: "start" });
     heading.focus({ preventScroll: true });
   });

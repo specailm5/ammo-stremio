@@ -9,11 +9,11 @@ and nothing here runs at request time. The page builds install URLs in the brows
 to Stremio. `docs/DESIGN.md` holds the visual direction; this file holds everything else.
 
 **Status:** all seven sources captured and each proved by a manifest fetch (§6). The page ships with
-no disabled card. It also ships an optional bulk shortcut built on Stremio's own account API, with its
-contract and its limits recorded in §16. Still open: the PenguPlay token field has to be confirmed
-against a real token, which is M4; the install click is confirmed on Windows only, so a phone and a
-television stay in M3; and the shortcut's happy path waits for one click by the account's owner, since
-testing it would write to their real addon list. Costs verified. One open contradiction resolved, one
+no disabled card. It leads with a sign-in path built on Stremio's own account API, whose contract and
+limits are recorded in §16, and it keeps the account-free seven steps below it. Still open: the
+PenguPlay token field has to be confirmed against a real token, which is M4; the install click is
+confirmed on Windows only, so a phone and a television stay in M3; and the sign-in path's happy path
+waits for one click by the account's owner, since testing it would write to their real addon list. Costs verified. One open contradiction resolved, one
 flagged (§5).
 
 ---
@@ -21,9 +21,10 @@ flagged (§5).
 ## 1. The honest pitch, and where the value actually is
 
 C has two weaknesses: seven separate installs, and no remote fix when an upstream breaks. The page
-cannot remove the second. The first it can now remove outright: the optional shortcut in §16 writes
-the whole collection in one request, so for a reader who has an account seven installs really do
-become one. For a reader who has none, the page does the next best thing and **makes seven installs
+cannot remove the second. The first it now removes outright, and makes it the default path: the
+sign-in section in §16 is the first thing after the headline and it writes the whole collection in one
+request, so for a reader who has an account seven installs really do become one. A reader who has none,
+or who will not type a password into this page, gets the next best thing and **seven installs made to
 feel like one procedure.**
 
 So the page is not a landing page with seven buttons. It is a numbered walkthrough with progress
@@ -44,29 +45,29 @@ nothing is blocked on it.
 
 ## 2. Scope guard
 
-In: one page, seven steps, the token flow, the optional bulk shortcut, a recovery section, a real FAQ.
+In: one page, a sign-in path, seven steps, the token flow, a recovery section, a real FAQ.
 
 Out, deliberately: a search box, a settings page, a "choose your sources" picker, a proxy, analytics,
 an addon of our own. Every one of those reintroduces the server or the configuration the whole option
-exists to avoid. The one thing that came back in is Stremio's own account, and only as an optional
-shortcut for the bulk install (§16). It changes no default, it adds no server, and the page still
-works without it.
+exists to avoid. The one thing that came back in is Stremio's own account, and it came back as the
+page's first choice rather than a side door (§16). It adds no server, it stores nothing, it removes
+nothing, and the account-free route below it is complete on its own for a reader who never signs in.
 
 ## 3. Page structure, in order
 
 1. **Wordmark + theme toggle.** The name as text, dark by default, a working light theme behind the toggle.
-2. **Opening.** One headline, one sentence, one primary button that scrolls to step one. No badge
-   above the headline, no stats, no screenshot we have not captured.
-3. **Before you start.** Two facts the reader needs before the steps: they need Stremio installed,
-   and they should be signed into the same account they use on the TV. This is where the sync
-   assumption is stated, so it is also where it is verified or dropped.
-4. **The seven steps.** Each step is one card: Latin source name, what it gives you in Arabic, the
+2. **Opening.** One headline, one sentence, one primary button, which lands on the sign-in section
+   because that is the first choice. No badge above the headline, no stats, no screenshot we have not
+   captured.
+3. **The sign-in path.** The first choice, directly under the opening: what it does, the one line that
+   states what it sends and to whom, an email and a password, a collapsed auth-key door for Facebook
+   and Google accounts, and one button (§16).
+4. **The manual path's preamble.** Stremio installed, the TV sync fact stated conditionally, and the
+   copy-each-link fallback, so a reader who will not sign in is not stranded.
+5. **The seven steps.** Each step is one card: Latin source name, what it gives you in Arabic, the
    install action, the copy-link fallback, and a "added it" mark that persists per device.
-5. **The token step (step seven).** The only step with an input, so it is expanded in place instead
+6. **The token step (step seven).** The only step with an input, so it is expanded in place instead
    of being left as a bare card (§5).
-6. **The bulk shortcut.** Optional, and labelled as optional, because it is the only part of the page
-   that asks for a credential. It sits after the steps and never before them, so the account-free
-   path stays the first thing a reader meets (§16).
 7. **Recovery.** What to do when a row empties, including Stremio's own reinstall trap (§9).
 8. **FAQ.** Questions this product's users actually ask, all of them answered honestly (§7).
 9. **Footer.** Only links that exist, and a claim that matches what the page does.
@@ -250,91 +251,104 @@ fall back to.
 
 ## 7. Copy deck (Arabic)
 
-Written to the Arabic skill: verbal sentences, actors named, no calqued connectives, no trailing
-`فقط` for restriction, no `تحديات` or `محوري`. Every string below is ready to ship. Where a claim
-rests on the owner's word rather than on a measurement taken here, the note under it says so, so a
-later reader can tell the two apart.
+Written in the **Saudi dialect**, on the owner's instruction of 2026-10-16, and that is the register
+every string a reader sees now ships in. This is a deliberate departure from the Arabic skill rather
+than an application of it: that skill is built to defend فصحى and names loose colloquial prose as one
+of the things it argues against. What still carries over from it is the rest of its substance, verbal
+sentences, actors named, no calqued connectives, no trailing `فقط` for restriction, no `تحديات` or
+`محوري`.
+
+The cost of the choice is worth writing down, because it is real: dialect lands hardest with a Gulf
+audience and softer with a Levantine or North African one. فصحى would travel wider. The owner picked
+dialect knowing that, so the trade is his call and not an oversight.
+
+The exact shipped strings are in `web/index.html` and `web/app.js`. What follows is the deck they were
+written from, so the two can be compared after any future edit.
 
 **Wordmark:** عمو ستريميو
 
-**Headline:** إضافات ستريميو، جاهزة بضغطة واحدة
+**Headline:** إضافات ستريميو جاهزة، بضغطة وحدة
 
-**Opening sentence:** سبع إضافات تفتح لك الأفلام والمسلسلات والأنمي والترجمة العربية في ستريميو. اخترنا
-الإعدادات نيابةً عنك، فلا تضبط شيئاً بيدك.
+**Opening sentence:** سبع إضافات تفتح لك الأفلام والمسلسلات والأنمي والترجمة العربية في ستريميو. جهّزنا
+الإعدادات عنك، فما تحتاج تظبط شي بيدك.
 
-**Primary button:** ابدأ الإضافة
+**Primary button:** يلا نبدأ
 
-**Before you start:** افتح هذه الصفحة على جوالك. وإن سجّلت الدخول في ستريميو بالحساب نفسه على التلفاز،
-وصلت الإضافات إليه بلا عمل إضافي. وإن كنت تشاهد من غير حساب، فانسخ روابط الإضافات أدناه وألصقها على
-التلفاز واحدة واحدة.
-> NOTE: written conditionally on purpose (§1), so an edge case in syncing cannot make the sentence false.
+**Sign-in section, the first choice (§16):**
+
+- Heading: أضفها كلها بضغطة وحدة
+- Intro: سجّل دخولك بحساب ستريميو، وتنضاف الإضافات كلها مرة وحدة. وإذا كنت مسجّل بنفس الحساب على تلفازك،
+  توصل له على طول مع أول مزامنة.
+- The line that carries the whole promise: هذا القسم وحده هو اللي يرسل شي من الصفحة، واللي ترسله يروح
+  لستريميو بس. ما عندنا خادم، ولا نحفظ شي، والحقلين ينمسحون بعد كل محاولة.
+- Button: أضفها لحسابي
+- Labels: إيميلك في ستريميو · كلمة المرور · مفتاح الدخول
+- Hint: اكتب إيميلك وكلمة المرور، وبعدها اضغط الزر.
+- The password-free door, for Facebook and Google accounts: حسابك على فيسبوك أو قوقل، وما له كلمة مرور؟
+- The way out, kept beside the way in: إذا ما ارتحت تكتب كلمة مرورك هنا، خلّ القسم هذا واشتغل بالأزرار
+  اللي تحت. هذي ما ترسل شي لأي جهة، وما تبي حساب من الأصل.
+
+**Manual path preamble:** تأكد إن ستريميو مثبّت عندك. وإذا ما كنت مسجّل دخول بنفس الحساب في الجوال
+والتلفاز، انسخ روابط الإضافات اللي تحت والصقها على التلفاز وحدة وحدة. وكل إضافة لها زر يفتحها لك في
+ستريميو على طول.
+> NOTE: the sync claim stays conditional on purpose (§1), so an edge case in syncing cannot make the sentence false.
 
 **Steps heading:** الإضافات السبع
 
-**Per-step controls:** أضِف إلى ستريميو · انسخ الرابط · أضفتها
+**Per-step controls:** أضفها لستريميو · انسخ الرابط · أضفتها · خلصت
 
-**Progress:** الثالثة من السبع
+**Progress:** ما أضفت شي للحين. · أضفت ٣ من ٧.
 
 **Step descriptions:**
-1. صفوف Netflix و Disney+ و Prime و Apple TV+ و HBO Max، أفلاماً ومسلسلات.
-2. مسلسلات آسيوية مترجمة: كورية وصينية ويابانية.
-3. مصادر مشاهدة للأفلام والمسلسلات.
-4. مصادر مشاهدة إضافية، وفيها صفوف قنوات مباشرة. بعض ملفاتها تتكرر مع الخطوة الثالثة، فالملف نفسه قد
-   يظهر مرتين.
+1. صفوف Netflix و Disney+ و Prime و Apple TV+ و HBO Max، أفلام ومسلسلات.
+2. مسلسلات آسيوية مترجمة: كوري وصيني وياباني وتايلندي.
+3. مصادر تشاهد منها الأفلام والمسلسلات.
+4. مصادر زيادة، وفيها صفوف قنوات مباشرة. بعض ملفاتها تتكرر مع الخطوة الثالثة، يعني نفس الملف يمكن يجيك
+   مرتين.
 5. صفوف الأنمي وتفاصيله.
 6. ترجمة عربية للأفلام والمسلسلات.
-7. مصادر مشاهدة سريعة، وتحتاج رمزاً خاصاً بك.
+7. مصادر سريعة، وتبي لها رمز خاص لك.
 
-**Token step heading:** الخطوة السابعة: PenguPlay
-
-**Token step intro:** هذه الإضافة وحدها تطلب رمزاً. تصدره لك قناة PenguPlay على تيليجرام، ولا يكلّفك
-شيئاً.
+**Token step intro:** هذي الإضافة لحالها تبي لها رمز، وتعطيك إياه قناة PenguPlay على تيليجرام، وببلاش.
 
 **Token steps:**
 1. افتح محادثة البوت في تيليجرام. (control: افتح البوت)
-2. أرسل إليه الأمر /token.
-3. سيردّ عليك برمز. انسخه.
-4. الصقه في الحقل أدناه، ثم اضغط زرّ الإضافة.
+2. أرسل له الأمر /token.
+3. بيجيك رمز. انسخه.
+4. الصقه في الحقل اللي تحت، وبعدها اضغط زر الإضافة.
 
-**QR caption:** أو امسح هذا الرمز بكاميرا جوالك. المسح ينفع حين تكون هذه الصفحة أمامك على التلفاز أو
-الحاسوب.
+**QR caption:** أو امسح هالرمز بكاميرا جوالك. المسح يفيدك لما تكون الصفحة قدامك على التلفاز أو اللابتوب.
 
-**Bot fallback:** إن لم يستجب البوت، فانضم إلى سيرفر PenguPlay على ديسكورد، واكتب الأمر نفسه فيه.
+**Bot fallback:** إذا البوت ما رد، ادخل سيرفر PenguPlay على ديسكورد، واكتب نفس الأمر هناك.
 
-**Token field:** label الرمز · placeholder الصق الرمز هنا · hint يطول الرمز عادةً، فتأكد أنك نسخته كاملاً.
+**Token field:** label الرمز · placeholder الصق الرمز هنا · hint الرمز يطول عادة، تأكد إنك نسخته كامل.
 
-**Privacy line:** يبني متصفحك الرابط هنا، ولا يرسل الرمز إلى أي جهة.
+**Privacy line:** متصفحك يبني الرابط هنا، وما يرسل الرمز لأي جهة.
 
-**Empty state:** لم تلصق رمزاً بعد.
+**Empty state:** ما لصقت رمز للحين.
 
-**Recovery heading:** إن اختفى صف أو فرغت إضافة
+**Copy feedback:** نسخناه
 
-**Recovery body:** يحصل هذا حين يغيّر المصدر عنوانه أو إعداداته. افتح هذه الصفحة، وأعد إضافة الصف الذي
-اختلّ وحده. وفي ستريميو لا تكفي إزالة الإضافة ثم إضافتها، لأنه لا يقرأ الإعدادات من جديد؛ الصق الرابط في
-خانة «رابط مستودع الإضافات» ليُعاد تحميله.
+**Recovery heading:** إذا اختفى صف أو فرغت إضافة
 
-**Recovery honesty line:** هذه صفحة ثابتة، لا تصل إلى إضافاتك من بعيد. الإصلاح بيدك، وخطواته أعلاه.
+**Recovery body:** يصير هذا لما يغيّر المصدر عنوانه أو إعداداته. افتح هذي الصفحة، وأعد إضافة الصف اللي
+اختلّ لحاله. وفي ستريميو، ما يكفي تشيل الإضافة وتحطها من جديد، لأنه ما يقرأ الإعدادات مرة ثانية؛ الصق
+الرابط في خانة «رابط مستودع الإضافات» عشان يحمّلها من جديد.
+
+**Recovery honesty line:** هذي صفحة ثابتة، ما توصل لإضافاتك من بعيد. الإصلاح بيدك، وخطواته فوق.
 
 **FAQ (questions worth asking about this product, not a template):**
 
 | Question | Answer |
 |---|---|
-| هل تحتاج إلى حساب ستريميو وكلمة مروره؟ | في الأزرار أعلاه لا. تُضاف الإضافات من جهازك مباشرة، فلا نطلبك حساباً ولا كلمة مرور. وإن استعملت الطريق المختصر فأنت من يسجّل الدخول، ولا يمرّ شيء من عندنا لأن الصفحة بلا خادم. |
-| ما الذي يحدث لبريدي وكلمة مروري في الطريق المختصر؟ | يقرأهما متصفحك، ويرسلهما في طلب واحد إلى api.strem.io، وهو خادم ستريميو نفسه. لا يمرّان على خادم لنا، فلا خادم لنا أصلاً، ولا نحفظهما في جهازك، ويمحى الحقلان بعد كل محاولة. |
-| لماذا سبع إضافات ولا رابط واحد يجمعها؟ | لأن رابطاً واحداً يجمعها يحتاج خادماً يعمل على مدار الساعة، ولا نريد أن نقف بينك وبين المصادر، فبقيت سبعاً. وإن أردت جمعها كلها، فذلك ممكن بلا خادم: تسجّل الدخول في القسم السابق مرة واحدة. |
-| هل يعمل على التلفاز؟ | نعم. وإن سجّلت الدخول بالحساب نفسه في الجوال والتلفاز، أضفت الإضافات مرة واحدة على الجوال فوصلت إليه. وإن لم تسجّل، نسختَ كل رابط وألصقته على التلفاز. |
-| ما مصير الرمز الذي ألصقه؟ | يدخل في الرابط الذي تضيفه إلى ستريميو، ويبقى في جهازك. |
+| يبي لها حساب ستريميو وكلمة مرور؟ | تسجيلك بحسابك أسرع طريقة، وتنضاف بها كلها مرة وحدة. وإذا ما تبغى تكتب حسابك، الأزرار اللي تحت تضيفها بدون حساب، وما ترسل شي لأي جهة. وفي الحالتين ما يمر شي من عندنا، لأن الصفحة ما عندها خادم. |
+| وش يصير لإيميلي وكلمة مروري؟ | يقراهم متصفحك، ويرسلهم في طلب واحد إلى api.strem.io، وهو خادم ستريميو نفسه. ما يمرون على خادم عندنا، لأننا ما عندنا خادم من الأصل، ولا نحفظهم في جهازك، والحقلين ينمسحون بعد كل محاولة. |
+| ليش سبع إضافات وما فيه رابط واحد يجمعها؟ | لأن رابط واحد يجمعها يبي له خادم شغّال على مدار الساعة، وحنا ما نبغى نقف بينك وبين المصادر. ولو تبغى تجمعها كلها، تقدر بدون خادم: سجّل دخولك من فوق مرة وحدة. |
+| تشتغل على التلفاز؟ | إيه. وإذا سجّلت دخولك بنفس الحساب في الجوال والتلفاز، أضفتها مرة وحدة من الجوال ووصلت له. وإذا ما سجّلت، تنسخ كل رابط وتلصقه على التلفاز. |
+| وش يصير للرمز اللي ألصقه؟ | يدخل في الرابط اللي تضيفه لستريميو، ويظل في جهازك. |
 
-**Bulk shortcut**, shipped in `web/index.html`. It is the only part of the page that sends anything,
-so its strings are held to the rule that they must stay true:
-
-- Heading: أو أضِفهنّ كلهنّ مرة واحدة
-- The line that carries the whole promise: هذه الفقرة وحدها هي التي ترسل شيئاً من هذه الصفحة، ويذهب
-  ما ترسله إلى ستريميو وحدها. لا خادم لنا، ولا نحتفظ بشيء، ويمحى الحقلان بعد كل محاولة.
-- Button: أضِفها إلى حسابي
-- The password-free door, for Facebook and Google accounts: حسابك عبر فيسبوك أو جوجل، فلا كلمة مرور له؟
-- The way out, kept beside the way in: إن لم ترتح إلى كتابة كلمة مرورك هنا، فاترك هذا القسم واعمل
-  بالأزرار أعلاه، فهي لا ترسل شيئاً إلى أي جهة، ولا تحتاج حساباً من الأصل.
+**Footer:** عمو ستريميو. ما عندنا خادم، ولا نحفظ شي. الأزرار تشتغل في متصفحك لحاله، والتسجيل بحسابك
+يخاطب ستريميو مباشرة.
 
 ## 8. States
 
@@ -410,6 +424,17 @@ hand-saved and no blue-to-pink tile sits inside a minimal warm page.
 Resolved on the owner's word: **the token is free** (§5.4). Step seven now says so, and nothing has to
 be verified before that copy is written.
 
+Settled on the owner's word, 2026-10-16, after the first build:
+
+- **The register is the Saudi dialect**, for every string a reader sees (§7). This knowingly departs
+  from the Arabic skill, which is built around فصحى and treats loose colloquial prose as a fault. The
+  rest of the skill still holds. The cost, recorded rather than hidden, is that dialect reads warmer in
+  the Gulf and cooler in the Levant and North Africa, so a future owner can revisit this as a decision
+  instead of rediscovering it as a drift.
+- **The sign-in path is the first choice**, above the per-addon steps (§16), and the page's single
+  button lands on it. The account-free route stays complete, so the page still works for a reader who
+  will not sign in, but it is no longer the default.
+
 ## 13. Milestones
 
 | # | Milestone | Done when |
@@ -441,12 +466,15 @@ states it conditionally (§1).
   titles, no index, no promotion.
 - **No telemetry** means breakage is learned from user complaints. That is the price of having no
   server and keeping nothing, and keeping nothing is worth more here than the telemetry.
-- **A credential on a community page.** The bulk shortcut is the one place a reader types a Stremio
-  password into a page that is not Stremio. It is optional, it comes after the account-free path, the
-  password goes only to `api.strem.io`, which is the same endpoint Stremio's own client posts to, and
-  nothing is stored. The residual risk is what it teaches: a reader who learns to type a Stremio
-  password into this page may type it into another one. That is why the card states that the buttons
-  above send nothing, and why the main feature still asks for no account at all.
+- **A credential on a community page.** The sign-in path is the one place a reader types a Stremio
+  password into a page that is not Stremio, and it is now the first thing the page asks for, which
+  raises this risk rather than lowering it. What holds it down: the password goes only to
+  `api.strem.io`, the same endpoint Stremio's own client posts to; nothing is stored, so there is no
+  session to leak between visits; the line that says exactly that sits above the fields; and the
+  account-free route is complete and immediately below. The residual risk is what the placement
+  teaches: a reader who learns to type a Stremio password into this page may type it into another one.
+  This is the strongest argument for demoting the form to an auth key only, and it stays on the record
+  for whoever holds the decision next.
 
 ## 15. antislop gate status for this document
 
@@ -471,18 +499,31 @@ plan level, and what is not:
   empty states, both exercised in the M2 pass.
 - **Pending:** the rest of the UI-side gate (R-03, R-32, R-34, R-35, and the liveliness block) because
   it runs at M6 against the finished page with a recorded click-through, not against a scaffold.
-- **R-36, the part the bulk shortcut changed:** adding that section made three shipped claims false,
+- **R-36, the part the sign-in path changed:** adding that section made three shipped claims false,
   and all three were rewritten in the same commit instead of being left standing: the footer's "we
   send nothing", the FAQ answer that the page never asks for a password, and the FAQ that explained
   the missing single link with "it would need a server". The page now names the one part that sends
   something and where it goes, and `pages.yml` fails the build on a hidden request channel so the
   narrower claim stays checkable.
+- **R-36, the register change:** every string a reader sees moved to the Saudi dialect on the owner's
+  instruction (§7, §12). The Arabic skill the copy was originally written to defends فصحى and names
+  loose colloquial prose as a fault, so this is recorded as a deliberate departure with its cost named
+  rather than as an application of the skill.
 
-## 16. The bulk shortcut
+## 16. The sign-in path, and why it sits first
 
-The owner asked for a second way to install, one that adds every addon at once. It is possible from
-a static page, and the reason it is possible is worth recording: Stremio's API answers cross-origin
-requests, measured rather than assumed, so the browser posts to it directly and no proxy appears.
+The owner asked for a second way to install, one that adds every addon at once, and then asked for it
+to be the first choice rather than a side door. It is possible from a static page, and the reason it
+is possible is worth recording: Stremio's API answers cross-origin requests, measured rather than
+assumed, so the browser posts to it directly and no proxy appears.
+
+Sitting first is a decision with a price, and the price is worth naming rather than leaving implicit.
+The page now leads with the one control that asks for a credential, which is the shape phishing takes.
+What earns the placement: it is genuinely the shortest path for the audience that has an account, the
+account-free route is one scroll below and complete on its own, and the line above the fields states
+what is sent and where. What does not: had the form been an auth key only, the page would ask for no
+password at all and this argument would disappear. That trade is the owner's, and it is written here
+so a later reader can see it was weighed rather than missed.
 
 The contract is taken from Stremio's own client, `stremio-api-client`, not from a wiki:
 
